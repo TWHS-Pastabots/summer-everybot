@@ -7,7 +7,6 @@ import edu.wpi.first.wpilibj.motorcontrol.MotorControllerGroup;
 import com.ctre.phoenix.motorcontrol.can.VictorSPX;
 import edu.wpi.first.util.sendable.Sendable;
 
-
 public class Drivebase extends SubsystemBase {
     
     private VictorSPX rightFrontVictor; 

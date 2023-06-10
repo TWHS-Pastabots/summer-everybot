@@ -5,14 +5,8 @@
 package frc.robot;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.PS4Controller;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.commands.TankDrive;
-import frc.robot.commands.ExampleCommand;
 import frc.robot.subsystems.Drivebase;
-import frc.robot.subsystems.ExampleSubsystem;
-import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.button.JoystickButton;
-import edu.wpi.first.wpilibj.Joystick;
 
 /**
  * This class is where the bulk of the robot should be declared. Since
@@ -24,21 +18,17 @@ import edu.wpi.first.wpilibj.Joystick;
  * subsystems, commands, and button mappings) should be declared here.
  */
 public class RobotContainer {
-    // The robot's subsystems and commands are defined here...
-    private final Drivebase m_Drivebase = new Drivebase();
-    private final TankDrive m_TankDrive = new TankDrive(m_Drivebase);
+
     private final PS4Controller driveController;
-    private final PS4Controller operatorController;
-
-    /**
-     * The container for the robot. Contains subsystems, OI devices, and commands.
-     */
+    private final Drivebase drivebase;
+    private final TankDrive tankDrive;
+    
     public RobotContainer() {
-        // Configure the button bindings
         driveController = new PS4Controller(0);
-        operatorController = new PS4Controller(1);
-
+        drivebase = new Drivebase();
+        tankDrive = new TankDrive(drivebase, driveController);
         configureButtonBindings();
+        defaultCommand();
     }
 
     /**
@@ -49,11 +39,11 @@ public class RobotContainer {
      * it to a {@link
      * edu.wpi.first.wpilibj2.command.button.JoystickButton}.
      */
-    private void configureButtonBindings() {
-        
-        JoystickButton button = new JoystickButton(driveController, PS4Controller.Button.kSquare.value);
-        Joystick right = new Joystick(0);
-        button.whenPressed(new TankDrive(new Drivebase()));
+    private void configureButtonBindings() {         
+    }
+
+    private void defaultCommand () {
+        drivebase.setDefaultCommand(tankDrive);
     }
 
     /**
@@ -61,8 +51,11 @@ public class RobotContainer {
      *
      * @return the command to run in autonomous
      */
-    public Command getAutonomousCommand() {
+    
+     /*
+     public Command getAutonomousCommand() {
         // An ExampleCommand will run in autonomous
         return m_autoCommand;
     }
+     */
 }
