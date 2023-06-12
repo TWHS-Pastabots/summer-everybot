@@ -17,9 +17,12 @@ public class Drivebase extends SubsystemBase {
     private VictorSPX leftFrontVictor;
     private MotorControllerGroup leftMotorControl;
     
+    
     private DifferentialDrive drive;
     
+    
     public Drivebase() {   
+        //This part makes all the motors for the drivetrain and gets ready for use. 
         rightFrontVictor = new VictorSPX(0);
             addChild("rightFrontVictor", (Sendable) rightFrontVictor);
             rightFrontVictor.setInverted(false);
@@ -39,6 +42,7 @@ public class Drivebase extends SubsystemBase {
         rightMotorControl = new MotorControllerGroup((MotorController)rightBackVictor, (MotorController)rightFrontVictor);  
         leftMotorControl = new MotorControllerGroup((MotorController)leftFrontVictor, (MotorController)leftBackVictor);
 
+        //This function is used to make a new drivetrain with all the settings
         drive = new DifferentialDrive(rightMotorControl, leftMotorControl);
             addChild("drive", drive);
             drive.setSafetyEnabled(true);
