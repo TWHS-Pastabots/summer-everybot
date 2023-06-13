@@ -30,8 +30,8 @@ public class TankDrive extends CommandBase{
     
     @Override
     public void execute() {
-        m_left = driveController.getRightY() + driveController.getRightX();
-        m_right = driveController.getRightY() - driveController.getRightX();
+        m_left = driveController.getLeftY();
+        m_right = driveController.getRightY();
         m_drivebase.drive(leftLimiter.calculate(m_left), rightLimiter.calculate(m_right));
     }
 
