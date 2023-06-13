@@ -1,16 +1,18 @@
 package frc.robot.subsystems;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
+import edu.wpi.first.wpilibj.motorcontrol.MotorController;
 import edu.wpi.first.wpilibj.motorcontrol.MotorControllerGroup;
-import edu.wpi.first.wpilibj.motorcontrol.PWMVictorSPX;
+import com.ctre.phoenix.motorcontrol.can.VictorSPX;
 
 public class Drivebase extends SubsystemBase {
     
-    private PWMVictorSPX rightVictor; 
+    private VictorSPX rightVictor; 
     private MotorControllerGroup rightMotorControl;
 
-    private PWMVictorSPX leftVictor;
+    private VictorSPX leftVictor;
     private MotorControllerGroup leftMotorControl;
     
     
@@ -19,19 +21,18 @@ public class Drivebase extends SubsystemBase {
     
     public Drivebase() {   
 
-        rightVictor = new PWMVictorSPX(0);
-            addChild("rightVictor", rightVictor);
+        rightVictor = new VictorSPX(0);
+            addChild("rightVictor", (Sendable) rightVictor);
             rightVictor.setInverted(false);
  
 
-        leftVictor = new PWMVictorSPX(1);
-            addChild("leftVictor", leftVictor);
+        leftVictor = new VictorSPX(1);
+            addChild("leftVictor", (Sendable) leftVictor);
             leftVictor.setInverted(false);
 
-        rightMotorControl = new MotorControllerGroup(rightVictor);  
-        leftMotorControl = new MotorControllerGroup(leftVictor);
+        rightMotorControl = new MotorControllerGroup((MotorController)rightVictor);  
+        leftMotorControl = new MotorControllerGroup((MotorController)leftVictor);
 
-        
         drive = new DifferentialDrive(rightMotorControl, leftMotorControl);
             addChild("drive", drive);
             drive.setSafetyEnabled(true);
