@@ -1,18 +1,21 @@
 package frc.robot.subsystems;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.motorcontrol.MotorController;
 import edu.wpi.first.wpilibj.motorcontrol.MotorControllerGroup;
 import com.ctre.phoenix.motorcontrol.can.VictorSPX;
+import com.revrobotics.CANSparkMax;
+import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
 public class Drivebase extends SubsystemBase {
     
-    private VictorSPX rightVictor; 
+    private VictorSPX rightVictor;
+    private CANSparkMax rightSpark;
     private MotorControllerGroup rightMotorControl;
 
     private VictorSPX leftVictor;
+    private CANSparkMax leftSpark;
     private MotorControllerGroup leftMotorControl;
     
     
@@ -22,16 +25,17 @@ public class Drivebase extends SubsystemBase {
     public Drivebase() {   
 
         rightVictor = new VictorSPX(0);
-            addChild("rightVictor", (Sendable) rightVictor);
             rightVictor.setInverted(false);
- 
+        rightSpark = new CANSparkMax(1, MotorType.kBrushed);
+            rightSpark.setInverted(false);
 
-        leftVictor = new VictorSPX(1);
-            addChild("leftVictor", (Sendable) leftVictor);
-            leftVictor.setInverted(false);
+        leftVictor = new VictorSPX(2);
+            leftVictor.setInverted(true);
+        leftSpark = new CANSparkMax(3, MotorType.kBrushed);
+            leftSpark.setInverted(true);
 
-        rightMotorControl = new MotorControllerGroup((MotorController)rightVictor);  
-        leftMotorControl = new MotorControllerGroup((MotorController)leftVictor);
+        rightMotorControl = new MotorControllerGroup((MotorController)rightVictor, (MotorController)rightSpark);  
+        leftMotorControl = new MotorControllerGroup((MotorController)leftVictor, (MotorController)leftSpark);
 
         drive = new DifferentialDrive(rightMotorControl, leftMotorControl);
             addChild("drive", drive);
