@@ -3,10 +3,17 @@
 // the WPILib BSD license file in the root directory of this project.
 
 package frc.robot;
-
-import edu.wpi.first.wpilibj.TimedRobot;
+import frc.robot.subsystems.Drivebase;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import com.revrobotics.CANSparkMax.IdleMode;
+import com.ctre.phoenix.motorcontrol.NeutralMode;
+import com.revrobotics.CANSparkMax;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
+import com.ctre.phoenix.motorcontrol.ControlMode;
+import com.ctre.phoenix.motorcontrol.can.VictorSPX;
+
+
 
 /**
  * The VM is configured to automatically run this class, and to call the
@@ -33,7 +40,50 @@ public class Robot extends TimedRobot {
         // and put our
         // autonomous chooser on the dashboard.
         m_robotContainer = new RobotContainer();
+        m_chooser.setDefaultOption("do nothing", kNothingAuto);
+        m_chooser.addOption("cone and mobility", kConeAuto);
+        m_chooser.addOption("cube and mobility", kCubeAuto);
+        SmartDashboard.putData("Auto choices", m_chooser);
+
+        
     }
+
+    public void setDriveMotors(double forward, double turn){
+            SmartDashboard.putNumber("drive forward power (%)", forward);
+            SmartDashboard.putNumber("drive turn power (%)", turn);
+
+            double left = forward - turn;
+            double right = forward + turn;
+
+            SmartDashboard.putNumber("drive left power (%)", left);
+            SmartDashboard.putNumber("drive right power (%)", right);
+
+
+            leftSpark.set(Left);
+            leftVictor.set(ControlMode.percent,Left);
+            rightSpark.set(Right);
+            rightVictor.set(ControlMode.percent, Right);
+    }
+
+     public void setArmMotor (double percent) {
+
+        arm.set(percent);
+        SmartDashboard.putNumber("arm power (%)", percent);
+        SmartDashboard.putNumber("arm motor current (amps)", arm.getOutputCurrent()); 
+        SmartDashboard.putNumber("arm motor temperature (C)", arm.getMotorTemperature());
+    
+    }
+    public void setIntake(double percent, int amps){
+            intake.set(percent);
+            intake.setSmartCurrentLimit(amps);
+            SmartDashboard.putNumber("Intake power (%)", percent);
+            SmartDashboard.putNumber("Intake motor current (amps)" , Intake.getOutputCurrent() );
+            SmartDashboard.putNumber("arm motor temperature (C)" , Intake.getMotorTemperature());
+
+
+    }
+
+    
 
     /**
      * This function is called every robot packet, no matter the mode. Use this for
@@ -55,6 +105,7 @@ public class Robot extends TimedRobot {
         // and running subsystem periodic() methods. This must be called from the
         // robot's periodic
         // block in order for anything in the Command-based framework to work.
+        
         CommandScheduler.getInstance().run();
     }
 
@@ -85,7 +136,13 @@ public class Robot extends TimedRobot {
     /** This function is called periodically during autonomous. */
     @Override
     public void autonomousPeriodic() {
+        
     }
+
+    static final int CONE = 1;
+    static final int CUBE = 2;
+    static final int NOTHING = 3;
+    int lastGamePiece;
 
     @Override
     public void teleopInit() {
@@ -97,11 +154,19 @@ public class Robot extends TimedRobot {
             m_autonomousCommand.cancel();
         }
 
+        leftSpark.setIdleMode(IdleMode.kBrake);
+        leftVictor.setNeutralMode(NeutralMode.kBrake);
+        rightSpark.setIdleMode(IdleMode.kBrake);
+        leftVictor.setNeutralMode(NeutralMode.kBrake);
+
+        lastGamePiece = NOTHING;
+
     }
 
     /** This function is called periodically during operator control. */
     @Override
     public void teleopPeriodic() {
+        //WE HAVE TO FIGURE OUT THE CONTROLS WE ARE GOING TO BE USING FOR ARM AND INTAKE
         
     }
 

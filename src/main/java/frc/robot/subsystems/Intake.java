@@ -16,24 +16,23 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class Arm extends SubsystemBase {
     
-    private static Arm m_instance;
-    private CANSparkMax m_armMotor;
-    static final int ARM_CURRENT_LIMIT_A = 20;
-    static final double ARM_OUTPUT_POWER = 0.4;
-
     
-    public Arm() {   
+    private CANSparkMax m_Intake;
+    static final int INTAKE_CURRENT_LIMIT_A = 25;
+    static final int INTAKE_HOLD_CURRENT_LIMIT_A = 5;
+    static final double INTAKE_OUTPUT_POWER = 1.0;
+    static final double INTAKE_HOLD_POWER = 0.07;
+    
+    public Intake() {   
 
-        CANSparkMax arm = new CANSparkMax(5,MotorType.kBrushless);
-
-            arm.setInverted(true);
-            arm.setIdleMode(IdleMode.kBrake);
-            arm.setSmartCurrentLimit(ARM_CURRENT_LIMIT_A);
+        CANSparkMax Intake = new CANSparkMax(6,MotorType.kBrushless);
+        Intake.setInverted(false);
+        Intake.setIdleMode(IdleMode.kBrake);
     }
 
-    public static arm getInstance() {
+    public static intake getInstance() {
         if (m_instance == null){
-            m_instance = new Arm;
+            m_instance = new Intake;
         }
         return m_instance;
     }
@@ -42,7 +41,7 @@ public class Arm extends SubsystemBase {
 
 
     public void runMotor(){
-        m_armMotor.set(0.5);
+        m_Intake.set(0.5);
     }
     @Override
     public void periodic() {
