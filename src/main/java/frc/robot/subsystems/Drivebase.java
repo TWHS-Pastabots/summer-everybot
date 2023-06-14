@@ -23,15 +23,15 @@ public class Drivebase extends SubsystemBase {
     
     
     public Drivebase() {   
-
+        //Right motor group
         rightVictor = new VictorSPX(0);
             rightVictor.setInverted(false);
         rightSpark = new CANSparkMax(1, MotorType.kBrushed);
             rightSpark.setInverted(false);
-
+        //Left motor group
         leftVictor = new VictorSPX(2);
             leftVictor.setInverted(true);
-        leftSpark = new CANSparkMax(3, MotorType.kBrushed);
+        leftSpark = new CANSparkMax(3, MotorType.kBrushed); 
             leftSpark.setInverted(true);
 
         rightMotorControl = new MotorControllerGroup((MotorController)rightVictor, (MotorController)rightSpark);  
@@ -39,6 +39,7 @@ public class Drivebase extends SubsystemBase {
 
         drive = new DifferentialDrive(rightMotorControl, leftMotorControl);
             addChild("drive", drive);
+            
             drive.setSafetyEnabled(true);
             drive.setExpiration(0.1);
             drive.setMaxOutput(1.0);

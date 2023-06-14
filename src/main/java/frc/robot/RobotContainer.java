@@ -7,6 +7,7 @@ import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.PS4Controller;
 import frc.robot.commands.TankDrive;
 import frc.robot.subsystems.Drivebase;
+import frc.robot.commands.drivetrain.DriveCommand;
 
 /**
  * This class is where the bulk of the robot should be declared. Since
@@ -39,7 +40,9 @@ public class RobotContainer {
      * it to a {@link
      * edu.wpi.first.wpilibj2.command.button.JoystickButton}.
      */
-    private void configureButtonBindings() {    
+    private void configureButtonBindings() { 
+        drivebase.setDefaultCommand(new DriveCommand(drivebase,driveController:: getLeftY,driveController :: getRightY));
+         
             
     }
 
