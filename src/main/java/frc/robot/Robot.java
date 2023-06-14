@@ -154,10 +154,10 @@ public class Robot extends TimedRobot {
             m_autonomousCommand.cancel();
         }
 
-        leftSpark.setIdleMode(IdleMode.kBrake);
-        leftVictor.setNeutralMode(NeutralMode.kBrake);
-        rightSpark.setIdleMode(IdleMode.kBrake);
-        leftVictor.setNeutralMode(NeutralMode.kBrake);
+        leftSpark.setIdleMode(IdleMode.kCoast);
+        leftVictor.setNeutralMode(NeutralMode.Coast);
+        rightSpark.setIdleMode(IdleMode.kCoast);
+        leftVictor.setNeutralMode(NeutralMode.Coast);
 
         lastGamePiece = NOTHING;
 
