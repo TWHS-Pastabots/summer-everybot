@@ -21,13 +21,24 @@ import frc.robot.commands.drivetrain.DriveCommand;
 public class RobotContainer {
 
     private final PS4Controller driveController;
+    private final PS4Controller operatorController;
     private final Drivebase drivebase;
+    private final Arm armBulid;
+    private final Intake intakeBulid;
     private final TankDrive tankDrive;
+    private final MoveIntake intakeMove;
+    private final MoveArm armMove;
+
     
     public RobotContainer() {
         driveController = new PS4Controller(0);
+        operatorController = new PS4Controller(1);
         drivebase = new Drivebase();
+        armBulid = new Arm();
+        intakeBulid = new Intake();
         tankDrive = new TankDrive(drivebase, driveController);
+        armMove = new MoveArm(armBulid,operatorController);
+        intakeMove = new MoveIntake(intakeBulid,operatorController);
         configureButtonBindings();
         defaultCommand();
     }
@@ -48,6 +59,9 @@ public class RobotContainer {
 
     private void defaultCommand () {
         drivebase.setDefaultCommand(tankDrive);
+        armBulid.setDefaultCommand(armMove);
+        intakeBulid.setDefaultCommand(intakeMove);
+
         
     }
 

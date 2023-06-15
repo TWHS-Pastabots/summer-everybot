@@ -5,6 +5,7 @@ import edu.wpi.first.wpilibj.PS4Controller;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.Drivebase;
 import frc.robot.subsystems.Arm;
+import frc.robot;
 
 
 public class MoveArm extends CommandBase{
@@ -29,7 +30,20 @@ public class MoveArm extends CommandBase{
     
     @Override
     public void execute() {
+        
+        
         double armPower; 
+        if (operatorController.getL2Axis(2)){
+            //Lower
+            armPower = -ARM_OUTPUT_POWER;
+        }else if (operatorController.getR2Axis(3)){
+            //Raise
+            armPower = ARM_OUTPUT_POWER;
+        }else{
+            armPower = 0.0;
+        }
+        setArmMotor(armPower);
+        
         
     }
 

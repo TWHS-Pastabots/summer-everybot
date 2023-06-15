@@ -40,8 +40,8 @@ public class Arm extends SubsystemBase {
    
 
 
-    public void runMotor(){
-        m_Intake.set(0.5);
+    public void runInMotor(){
+        m_Intake.set(0.0);
     }
     @Override
     public void periodic() {

@@ -12,6 +12,9 @@ import com.revrobotics.CANSparkMax;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.can.VictorSPX;
+import frc.robot.commands.MoveArm;
+import frc.robot.commands.MoveIntake;
+import frc.robot.commands.TankDrive;
 
 
 
@@ -40,6 +43,7 @@ public class Robot extends TimedRobot {
         // and put our
         // autonomous chooser on the dashboard.
         m_robotContainer = new RobotContainer();
+
         m_chooser.setDefaultOption("do nothing", kNothingAuto);
         m_chooser.addOption("cone and mobility", kConeAuto);
         m_chooser.addOption("cube and mobility", kCubeAuto);
@@ -167,7 +171,7 @@ public class Robot extends TimedRobot {
     @Override
     public void teleopPeriodic() {
         //WE HAVE TO FIGURE OUT THE CONTROLS WE ARE GOING TO BE USING FOR ARM AND INTAKE
-        
+        CommandScheduler.getInstance().run();
     }
 
     @Override
