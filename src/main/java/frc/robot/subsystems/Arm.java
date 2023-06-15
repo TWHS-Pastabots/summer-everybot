@@ -1,55 +1,45 @@
 package frc.robot.subsystems;
-
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import edu.wpi.first.wpilibj.drive.DifferentialDrive;
-import edu.wpi.first.wpilibj.motorcontrol.MotorController;
-import edu.wpi.first.wpilibj.motorcontrol.MotorControllerGroup;
-import com.ctre.phoenix.motorcontrol.can.VictorSPX;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import com.revrobotics.CANSparkMax.IdleMode;
-import frc.robot.commands.TankDrive;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
-
-
-
-public class Arm extends SubsystemBase {
-    
-    private static Arm m_instance;
-    private CANSparkMax m_armMotor;
+public class Arm {
+    private static Arm instance;
+    private CANSparkMax motor;
     static final int ARM_CURRENT_LIMIT_A = 20;
     static final double ARM_OUTPUT_POWER = 0.4;
+    private ArmState state;
 
-    
-    public Arm() {   
-
-        CANSparkMax arm = new CANSparkMax(5,MotorType.kBrushless);
-
-            arm.setInverted(true);
-            arm.setIdleMode(IdleMode.kBrake);
-            arm.setSmartCurrentLimit(ARM_CURRENT_LIMIT_A);
+    public enum ArmState {
+        RAISE,
+        LOWER,
     }
 
-    public static arm getInstance() {
-        if (m_instance == null){
-            m_instance = new Arm;
+    public Arm() {
+        motor = new CANSparkMax(5, MotorType.kBrushless);
+
+        motor.setInverted(true);
+        motor.setIdleMode(IdleMode.kBrake);
+        motor.setSmartCurrentLimit(ARM_CURRENT_LIMIT_A);
+    }
+
+    public static Arm getInstance() {
+        if (instance == null) {
+            instance = new Arm();
         }
-        return m_instance;
+        return instance;
     }
 
-   
-
-
-    public void runMotor(){
-        m_armMotor.set(0.5);
-    }
-    @Override
-    public void periodic() {
-        // This method will be called once per scheduler run
+    public void update() {
+        if(state == ArmState.RAISE)
+            motor.set(ARM_OUTPUT_POWER);
+        else if (state == ArmState.LOWER)
+            motor.set(-ARM_OUTPUT_POWER);
+        else
+            motor.set(0.0);
     }
 
-    @
-
-    
+    public void setState(ArmState state) {
+        this.state = state;
+    }
 }
