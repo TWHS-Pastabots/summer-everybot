@@ -31,6 +31,7 @@ public class Intake {
         motor = new CANSparkMax(6, MotorType.kBrushless);
         motor.setInverted(false);
         motor.setIdleMode(IdleMode.kBrake);
+        
     }
 
     public static Intake getInstance() {
