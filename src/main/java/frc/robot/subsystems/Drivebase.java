@@ -17,11 +17,14 @@ public class Drivebase {
         rightVictor.setInverted(false);
         rightSpark = new CANSparkMax(1, MotorType.kBrushed);
         rightSpark.setInverted(false);
+        rightSpark.setSmartCurrentLimit(10);
         // Left motor group
         leftVictor = new VictorSPX(2);
         leftVictor.setInverted(true);
         leftSpark = new CANSparkMax(3, MotorType.kBrushed);
         leftSpark.setInverted(true);
+        leftSpark.setSmartCurrentLimit(10);
+        
     }
 
     public void drive (double y, double x) {
