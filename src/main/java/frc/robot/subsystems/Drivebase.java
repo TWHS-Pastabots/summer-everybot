@@ -19,12 +19,16 @@ public class Drivebase {
         // Right motor group
         rightVictor = new VictorSPX(0);
         rightVictor.setInverted(false);
+        rightVictor.configVoltageCompSaturation(12);
+        rightVictor.enableVoltageCompensation(true);
         rightSpark = new CANSparkMax(1, MotorType.kBrushed);
         rightSpark.setInverted(false);
         rightSpark.setSmartCurrentLimit(10);
         // Left motor group
         leftVictor = new VictorSPX(2);
         leftVictor.setInverted(true);
+        leftVictor.configVoltageCompSaturation(12);
+        leftVictor.enableVoltageCompensation(true);
         leftSpark = new CANSparkMax(3, MotorType.kBrushed);
         leftSpark.setInverted(true);
         leftSpark.setSmartCurrentLimit(10);
