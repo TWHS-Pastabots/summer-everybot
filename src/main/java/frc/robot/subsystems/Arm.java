@@ -21,6 +21,7 @@ public class Arm {
         motor.setInverted(true);
         motor.setIdleMode(IdleMode.kBrake);
         motor.setSmartCurrentLimit(ARM_CURRENT_LIMIT_A);
+        
     }
 
     public static Arm getInstance() {

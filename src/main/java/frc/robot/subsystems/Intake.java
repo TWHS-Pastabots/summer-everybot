@@ -28,6 +28,7 @@ public class Intake {
         motor = new CANSparkMax(6, MotorType.kBrushless);
         motor.setInverted(false);
         motor.setIdleMode(IdleMode.kBrake);
+        motor.setSmartCurrentLimit(INTAKE_CURRENT_LIMIT_A);
         
     }
 
