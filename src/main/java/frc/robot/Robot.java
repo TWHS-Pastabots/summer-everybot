@@ -35,8 +35,8 @@ public class Robot extends TimedRobot {
 
   private Drivebase drivebase;
   private Intake intake;
-  private GamePiece lastGamePiece;
   private Arm arm;
+  private GamePiece lastGamePiece;
 
   private enum GamePiece {
     CONE,
@@ -86,7 +86,7 @@ public class Robot extends TimedRobot {
 
   @Override
   public void teleopPeriodic() {
-    drivebase.drive(driveController.getRightX(), driveController.getLeftY());
+    drivebase.drive(driveController.getLeftY(), driveController.getRightY());
 
     boolean squareButton = operatorController.getSquareButton();
     boolean circleButton = operatorController.getCircleButton();

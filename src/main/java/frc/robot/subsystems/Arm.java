@@ -17,7 +17,6 @@ public class Arm {
 
     public Arm() {
         motor = new CANSparkMax(5, MotorType.kBrushless);
-
         motor.setInverted(true);
         motor.setIdleMode(IdleMode.kBrake);
         motor.setSmartCurrentLimit(ARM_CURRENT_LIMIT_A);

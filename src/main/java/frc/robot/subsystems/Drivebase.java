@@ -15,30 +15,28 @@ public class Drivebase {
     
 
     public Drivebase() {
-        
         // Right motor group
         rightVictor = new VictorSPX(0);
         rightVictor.setInverted(false);
-        rightVictor.configVoltageCompSaturation(12);
+        rightVictor.configVoltageCompSaturation(6);
         rightVictor.enableVoltageCompensation(true);
         rightSpark = new CANSparkMax(1, MotorType.kBrushed);
         rightSpark.setInverted(false);
-        rightSpark.setSmartCurrentLimit(10);
+        rightSpark.setSmartCurrentLimit(5);
         // Left motor group
         leftVictor = new VictorSPX(2);
         leftVictor.setInverted(true);
-        leftVictor.configVoltageCompSaturation(12);
+        leftVictor.configVoltageCompSaturation(6);
         leftVictor.enableVoltageCompensation(true);
         leftSpark = new CANSparkMax(3, MotorType.kBrushed);
         leftSpark.setInverted(true);
-        leftSpark.setSmartCurrentLimit(10);
+        leftSpark.setSmartCurrentLimit(5);
         
     }
 
-    public void drive (double y, double x) {
-         
-        double leftOutput = y + x;
-        double rightOutput = y - x;
+    public void drive (double left, double right) {
+        double leftOutput = left;
+        double rightOutput = right;
         
         leftVictor.set(ControlMode.PercentOutput, leftOutput);
         leftSpark.set(leftOutput);
