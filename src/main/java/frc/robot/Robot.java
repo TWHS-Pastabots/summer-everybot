@@ -37,6 +37,7 @@ public class Robot extends TimedRobot {
   private PS4Controller operatorController;
 
   private Drivebase drivebase;
+  private static final double MAX_SPEED = 0.5;
   private Intake intake;
   private Arm arm;
   private GamePiece lastGamePiece;
@@ -95,7 +96,10 @@ public class Robot extends TimedRobot {
 
     double xAxis = driveController.getRightX();
     double yAxis = -driveController.getLeftY();
-    drivebase.drive(xAxis,yAxis);
+    double SpeedxAxis = xAxis*MAX_SPEED;
+    double SpeedyAxis = yAxis*MAX_SPEED;
+
+    drivebase.drive(SpeedxAxis,SpeedyAxis);
     
 
     boolean squareButton = operatorController.getSquareButton();
