@@ -1,8 +1,11 @@
 package frc.robot.subsystems;
 import com.ctre.phoenix.motorcontrol.ControlMode;
+import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.can.VictorSPX;
 import com.revrobotics.CANSparkMax;
+import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
+
 
 
 
@@ -12,6 +15,7 @@ public class Drivebase {
     private VictorSPX leftVictor;
     private CANSparkMax rightSpark;
     private CANSparkMax leftSpark;
+    
     
 
     
@@ -37,6 +41,13 @@ public class Drivebase {
         leftSpark = new CANSparkMax(3, MotorType.kBrushed);
         leftSpark.setInverted(true);
         leftSpark.setSmartCurrentLimit(5);
+
+        rightSpark.setIdleMode(IdleMode.kCoast);
+        rightVictor.setNeutralMode(NeutralMode.Coast);
+        leftSpark.setIdleMode(IdleMode.kCoast);
+        leftVictor.setNeutralMode(NeutralMode.Coast);
+
+
 
         
     }

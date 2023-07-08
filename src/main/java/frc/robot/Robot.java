@@ -5,6 +5,9 @@
 package frc.robot;
 
 
+
+
+
 import edu.wpi.first.wpilibj.PS4Controller;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
@@ -82,12 +85,18 @@ public class Robot extends TimedRobot {
   public void teleopInit() {
     driveController = new PS4Controller(0);
     operatorController = new PS4Controller(1);
+    
+    
+    
   }
 
   @Override
   public void teleopPeriodic() {
+
+    double xAxis = driveController.getRightX();
+    double yAxis = -driveController.getLeftY();
+    drivebase.drive(xAxis,yAxis);
     
-    drivebase.drive(-driveController.getRawAxis(1), driveController.getRawAxis(2));
 
     boolean squareButton = operatorController.getSquareButton();
     boolean circleButton = operatorController.getCircleButton();
