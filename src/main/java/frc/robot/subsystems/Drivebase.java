@@ -6,11 +6,15 @@ import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
 
 
+
 public class Drivebase {
     private VictorSPX rightVictor;
     private VictorSPX leftVictor;
     private CANSparkMax rightSpark;
     private CANSparkMax leftSpark;
+    
+
+    
     private static Drivebase instance;
     
 
@@ -23,6 +27,8 @@ public class Drivebase {
         rightSpark = new CANSparkMax(1, MotorType.kBrushed);
         rightSpark.setInverted(false);
         rightSpark.setSmartCurrentLimit(5);
+        
+    
         // Left motor group
         leftVictor = new VictorSPX(2);
         leftVictor.setInverted(true);
@@ -31,12 +37,13 @@ public class Drivebase {
         leftSpark = new CANSparkMax(3, MotorType.kBrushed);
         leftSpark.setInverted(true);
         leftSpark.setSmartCurrentLimit(5);
+
         
     }
 
-    public void drive (double left, double right) {
-        double leftOutput = left;
-        double rightOutput = right;
+    public void drive (double turn, double forward) {
+        double leftOutput = forward - turn;
+        double rightOutput = forward + turn;
         
         leftVictor.set(ControlMode.PercentOutput, leftOutput);
         leftSpark.set(leftOutput);

@@ -86,7 +86,8 @@ public class Robot extends TimedRobot {
 
   @Override
   public void teleopPeriodic() {
-    drivebase.drive(driveController.getLeftY(), driveController.getRightY());
+    
+    drivebase.drive(-driveController.getRawAxis(1), driveController.getRawAxis(2));
 
     boolean squareButton = operatorController.getSquareButton();
     boolean circleButton = operatorController.getCircleButton();
