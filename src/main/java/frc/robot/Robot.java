@@ -94,7 +94,7 @@ public class Robot extends TimedRobot {
   @Override
   public void teleopPeriodic() {
 
-    double xAxis = driveController.getRightX();
+    double xAxis = driveController.getRightY();
     double yAxis = -driveController.getLeftY();
     double SpeedxAxis = xAxis*MAX_SPEED;
     double SpeedyAxis = yAxis*MAX_SPEED;
@@ -119,10 +119,12 @@ public class Robot extends TimedRobot {
       intake.setState(IntakeState.OFF);
     intake.update();
 
-    if (operatorController.getL2Button())
-      arm.setState(ArmState.LOWER);
-    else if (operatorController.getR2Button())
+    boolean Lower = operatorController.getL2Button();
+    boolean Raise = operatorController.getR2Button();
+    if (Raise)
       arm.setState(ArmState.RAISE);
+    else if (Lower)
+      arm.setState(ArmState.LOWER);
     arm.update();
   }
 

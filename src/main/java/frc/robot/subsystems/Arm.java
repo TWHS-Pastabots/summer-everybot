@@ -6,7 +6,7 @@ import com.revrobotics.CANSparkMax.IdleMode;
 public class Arm {
     private static Arm instance;
     private CANSparkMax motor;
-    static final int ARM_CURRENT_LIMIT_A = 20;
+    static final int ARM_CURRENT_LIMIT_A = 5;
     static final double ARM_OUTPUT_POWER = 0.4;
     private ArmState state;
 

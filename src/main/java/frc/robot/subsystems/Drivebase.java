@@ -52,9 +52,9 @@ public class Drivebase {
         
     }
 
-    public void drive (double turn, double forward) {
-        double leftOutput = forward - turn;
-        double rightOutput = forward + turn;
+    public void drive (double forward, double turn) {
+        double leftOutput = forward;
+        double rightOutput = turn;
         
         leftVictor.set(ControlMode.PercentOutput, leftOutput);
         leftSpark.set(leftOutput);
