@@ -4,10 +4,6 @@
 
 package frc.robot;
 
-
-
-
-
 import edu.wpi.first.wpilibj.PS4Controller;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
@@ -33,11 +29,10 @@ public class Robot extends TimedRobot {
   private String m_autoSelected;
   private final SendableChooser<String> m_chooser = new SendableChooser<>();
 
-  private PS4Controller driveController;
-  private PS4Controller operatorController;
+  private PS4Controller driver;
+  private PS4Controller operator;
 
   private Drivebase drivebase;
-  private static final double MAX_SPEED = 0.5;
   private Intake intake;
   private Arm arm;
   private GamePiece lastGamePiece;
@@ -84,26 +79,17 @@ public class Robot extends TimedRobot {
 
   @Override
   public void teleopInit() {
-    driveController = new PS4Controller(0);
-    operatorController = new PS4Controller(1);
-    
-    
-    
+    driver = new PS4Controller(0);
+    operator = new PS4Controller(1);
+
   }
 
   @Override
   public void teleopPeriodic() {
+    drivebase.drive(driver.getLeftY(), driver.getRightY());
 
-    double xAxis = driveController.getRightY();
-    double yAxis = -driveController.getLeftY();
-    double SpeedxAxis = xAxis*MAX_SPEED;
-    double SpeedyAxis = yAxis*MAX_SPEED;
-
-    drivebase.drive(SpeedxAxis,SpeedyAxis);
-    
-
-    boolean squareButton = operatorController.getSquareButton();
-    boolean circleButton = operatorController.getCircleButton();
+    boolean squareButton = operator.getSquareButton();
+    boolean circleButton = operator.getCircleButton();
 
     if (squareButton) {
       intake.setState(IntakeState.INTAKE);
@@ -119,13 +105,7 @@ public class Robot extends TimedRobot {
       intake.setState(IntakeState.OFF);
     intake.update();
 
-    boolean Lower = operatorController.getL2Button();
-    boolean Raise = operatorController.getR2Button();
-    if (Raise)
-      arm.setState(ArmState.RAISE);
-    else if (Lower)
-      arm.setState(ArmState.LOWER);
-    arm.update();
+    arm.setPower(operator.getLeftY());
   }
 
   @Override

@@ -2,16 +2,13 @@ package frc.robot.subsystems;
 
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
-import com.revrobotics.CANSparkMax.IdleMode;
 
-
-
+import frc.robot.Ports;
 
 public class Intake {
-    private static Intake m_instance;
-    private CANSparkMax motor;
-    static final int INTAKE_CURRENT_LIMIT_A = 25;
-    static final int INTAKE_HOLD_CURRENT_LIMIT_A = 5;
+    private static Intake instance;
+    private CANSparkMax intake;
+
     static final double INTAKE_OUTPUT_POWER = 1.0;
     static final double INTAKE_HOLD_POWER = 0.07;
     private IntakeState state;
@@ -25,34 +22,32 @@ public class Intake {
     }
 
     public Intake() {
-        motor = new CANSparkMax(6, MotorType.kBrushless);
-        motor.setInverted(false);
-        motor.setIdleMode(IdleMode.kBrake);
-        motor.setSmartCurrentLimit(INTAKE_CURRENT_LIMIT_A);
-        
-    }
+        intake = new CANSparkMax(Ports.INTAKE, MotorType.kBrushless);
+        intake.setInverted(false);
 
-    public static Intake getInstance() {
-        if (m_instance == null) {
-            m_instance = new Intake();
-        }
-        return m_instance;
-    } 
+    }
 
     public void setState(IntakeState state) {
         this.state = state;
     }
 
-    public void update () {
+    public void update() {
         if (state == IntakeState.OFF)
-            motor.set(0.0);
-        else if(state == IntakeState.HOLD_CUBE)
-            motor.set(INTAKE_HOLD_POWER);
+            intake.set(0.0);
+        else if (state == IntakeState.HOLD_CUBE)
+            intake.set(INTAKE_HOLD_POWER);
         else if (state == IntakeState.HOLD_CONE)
-            motor.set(-INTAKE_HOLD_POWER);
-        else if(state == IntakeState.INTAKE)
-            motor.set(INTAKE_OUTPUT_POWER);
-        else if(state == IntakeState.OUTTAKE)
-            motor.set(-INTAKE_OUTPUT_POWER);
+            intake.set(-INTAKE_HOLD_POWER);
+        else if (state == IntakeState.INTAKE)
+            intake.set(INTAKE_OUTPUT_POWER);
+        else if (state == IntakeState.OUTTAKE)
+            intake.set(-INTAKE_OUTPUT_POWER);
+    }
+
+    public static Intake getInstance() {
+        if (instance == null) {
+            instance = new Intake();
+        }
+        return instance;
     }
 }
