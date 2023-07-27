@@ -4,13 +4,17 @@
 
 package frc.robot;
 
+import com.ctre.phoenix.motorcontrol.ControlMode;
+import com.ctre.phoenix.motorcontrol.can.VictorSPX;
+import com.revrobotics.CANSparkMax;
+
 import edu.wpi.first.wpilibj.PS4Controller;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.subsystems.Drivebase;
 import frc.robot.subsystems.Intake;
-import frc.robot.subsystems.Arm.ArmState;
+//import frc.robot.subsystems.Arm.ArmState;
 import frc.robot.subsystems.Intake.IntakeState;
 import frc.robot.subsystems.Arm;
 
@@ -29,18 +33,17 @@ public class Robot extends TimedRobot {
   private String m_autoSelected;
   private final SendableChooser<String> m_chooser = new SendableChooser<>();
 
-  private PS4Controller driver;
-  private PS4Controller operator;
-
+  private PS4Controller driveController;
+  private PS4Controller operatorController;
+  private String lastGP;
   private Drivebase drivebase;
   private Intake intake;
   private Arm arm;
-  private GamePiece lastGamePiece;
 
-  private enum GamePiece {
-    CONE,
-    CUBE
-  }
+  // private enum GamePiece {
+  // CONE,
+  // CUBE
+  // }
 
   @Override
   public void robotInit() {
@@ -51,6 +54,38 @@ public class Robot extends TimedRobot {
     drivebase = Drivebase.getInstance();
     intake = Intake.getInstance();
     arm = Arm.getInstance();
+
+    boolean sparkFailure = false;
+    boolean victorFailure = false;
+
+    CANSparkMax[] sparkMaxes = { Arm.armController, Drivebase.leftSparkController, Drivebase.rightSparkController,
+        Intake.intakeController };
+    VictorSPX[] victors = { Drivebase.leftVictorController, Drivebase.rightVictorController };
+
+    for (CANSparkMax sm : sparkMaxes) {
+      sm.set(0.001);
+
+      if (sm.getAppliedOutput() < 0.0005) {
+        sparkFailure = true;
+      }
+
+      SmartDashboard.putNumber(sm.getDeviceId() + " Spark Velocity",
+          sm.getEncoder().getVelocity());
+      SmartDashboard.putNumber(sm.getDeviceId() + " Spark Temperature", sm.getMotorTemperature());
+    }
+    for (VictorSPX vs : victors) {
+      vs.set(ControlMode.PercentOutput, 0.0001);
+
+      if (vs.getMotorOutputPercent() <= 0.0005) {
+        victorFailure = true;
+      }
+
+      SmartDashboard.putNumber(vs.getDeviceID() + " Victor Temperature",
+          vs.getTemperature());
+    }
+
+    SmartDashboard.putBoolean("Spark Failure", sparkFailure);
+    SmartDashboard.putBoolean("Victor Failure", victorFailure);
   }
 
   @Override
@@ -79,33 +114,43 @@ public class Robot extends TimedRobot {
 
   @Override
   public void teleopInit() {
-    driver = new PS4Controller(0);
-    operator = new PS4Controller(1);
-
+    driveController = new PS4Controller(0);
+    operatorController = new PS4Controller(1);
   }
 
   @Override
   public void teleopPeriodic() {
-    drivebase.drive(driver.getLeftY(), driver.getRightY());
+    // drive
+    drivebase.drive(-driveController.getLeftY(), driveController.getRightY());
 
-    boolean squareButton = operator.getSquareButton();
-    boolean circleButton = operator.getCircleButton();
-
-    if (squareButton) {
-      intake.setState(IntakeState.INTAKE);
-      lastGamePiece = GamePiece.CUBE;
-    } else if (circleButton) {
-      intake.setState(IntakeState.OUTTAKE);
-      lastGamePiece = GamePiece.CONE;
-    } else if (lastGamePiece == GamePiece.CUBE)
-      intake.setState(IntakeState.HOLD_CUBE);
-    else if (lastGamePiece == GamePiece.CONE)
+    // intake
+    if (operatorController.getCircleButton()) {
+      intake.setState(IntakeState.INTAKE_CO);
+      lastGP = "Cone";
+    } else if (operatorController.getTriangleButton()) {
+      intake.setState(IntakeState.INTAKE_CU);
+      lastGP = "Cube";
+    } else if (lastGP == "Cone") {
       intake.setState(IntakeState.HOLD_CONE);
-    else
+    } else if (lastGP == "Cube") {
+      intake.setState(IntakeState.HOLD_CUBE);
+    } else if (operatorController.getSquareButton() & lastGP == "Cone") {
+      intake.setState(IntakeState.OUTAKE_CO);
+    } else if (operatorController.getSquareButton() & lastGP == "Cube") {
+      intake.setState(IntakeState.OUTAKE_CU);
+    } else if (operatorController.getSquareButton() & lastGP == null) {
       intake.setState(IntakeState.OFF);
+    }
     intake.update();
 
-    arm.setPower(operator.getLeftY());
+    // arm
+    // if (operatorController.getR2Button()) {
+    // arm.setState(ArmState.EXTENDED);
+    // } else if (operatorController.getL2Button()) {
+    // arm.setState(ArmState.RETRACTED);
+    // }
+    // arm.update();
+    arm.setPower(operatorController.getLeftY());
   }
 
   @Override

@@ -1,46 +1,52 @@
 package frc.robot.subsystems;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
+import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.can.VictorSPX;
 import com.revrobotics.CANSparkMax;
+import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
 import frc.robot.Ports;
 
 public class Drivebase {
-    private VictorSPX rightVictor;
-    private VictorSPX leftVictor;
-    private CANSparkMax rightSpark;
-    private CANSparkMax leftSpark;
-
+    public static VictorSPX rightVictorController;
+    public static VictorSPX leftVictorController;
+    public static CANSparkMax rightSparkController;
+    public static CANSparkMax leftSparkController;
     private static Drivebase instance;
 
-    private final double MAX_SPEED = 0.5;
+    private static final double MAX_SPEED = 0.5;
 
     public Drivebase() {
         // Right motor group
-        rightVictor = new VictorSPX(Ports.RIGHT_VICTOR);
-        rightVictor.setInverted(false);
+        rightVictorController = new VictorSPX(Ports.RIGHT_VICTOR);
+        rightVictorController.setInverted(false);
+        rightVictorController.setNeutralMode(NeutralMode.Brake);
 
-        rightSpark = new CANSparkMax(Ports.RIGHT_SPARK, MotorType.kBrushed);
-        rightSpark.setInverted(false);
+        rightSparkController = new CANSparkMax(Ports.RIGHT_SPARK, MotorType.kBrushed);
+        rightSparkController.setInverted(true);
+        rightSparkController.setIdleMode(IdleMode.kBrake);
 
         // Left motor group
-        leftVictor = new VictorSPX(Ports.LEFT_VICTOR);
-        leftVictor.setInverted(true);
+        leftVictorController = new VictorSPX(Ports.LEFT_VICTOR);
+        leftVictorController.setInverted(false);
+        leftVictorController.setNeutralMode(NeutralMode.Brake);
 
-        leftSpark = new CANSparkMax(Ports.LEFT_SPARK, MotorType.kBrushed);
-        leftSpark.setInverted(true);
+        leftSparkController = new CANSparkMax(Ports.LEFT_SPARK, MotorType.kBrushed);
+        leftSparkController.setInverted(true);
+        leftSparkController.setIdleMode(IdleMode.kBrake);
     }
 
     public void drive(double left, double right) {
-        double leftOutput = left * MAX_SPEED;
-        double rightOutput = right * MAX_SPEED;
+        double leftSpeed = left * MAX_SPEED;
+        double rightSpeed = right * MAX_SPEED;
 
-        leftVictor.set(ControlMode.PercentOutput, leftOutput);
-        leftSpark.set(leftOutput);
-        rightVictor.set(ControlMode.PercentOutput, rightOutput);
-        rightSpark.set(rightOutput);
+        leftVictorController.set(ControlMode.PercentOutput, leftSpeed);
+        leftSparkController.set(leftSpeed);
+
+        rightVictorController.set(ControlMode.PercentOutput, rightSpeed);
+        rightSparkController.set(rightSpeed);
     }
 
     public static Drivebase getInstance() {
