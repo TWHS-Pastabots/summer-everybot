@@ -4,9 +4,9 @@
 
 package frc.robot;
 
-import com.ctre.phoenix.motorcontrol.ControlMode;
-import com.ctre.phoenix.motorcontrol.can.VictorSPX;
-import com.revrobotics.CANSparkMax;
+//import com.ctre.phoenix.motorcontrol.ControlMode;
+//import com.ctre.phoenix.motorcontrol.can.VictorSPX;
+//import com.revrobotics.CANSparkMax;
 
 import edu.wpi.first.wpilibj.PS4Controller;
 import edu.wpi.first.wpilibj.TimedRobot;
@@ -14,6 +14,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.subsystems.Drivebase;
 import frc.robot.subsystems.Intake;
+import frc.robot.subsystems.Arm.ArmState;
 //import frc.robot.subsystems.Arm.ArmState;
 import frc.robot.subsystems.Intake.IntakeState;
 import frc.robot.subsystems.Arm;
@@ -49,43 +50,45 @@ public class Robot extends TimedRobot {
   public void robotInit() {
     m_chooser.setDefaultOption("Default Auto", kDefaultAuto);
     m_chooser.addOption("My Auto", kCustomAuto);
-    SmartDashboard.putData("Auto choices", m_chooser);
 
     drivebase = Drivebase.getInstance();
     intake = Intake.getInstance();
     arm = Arm.getInstance();
 
-    boolean sparkFailure = false;
-    boolean victorFailure = false;
+    // boolean sparkFailure = false;
+    // boolean victorFailure = false;
 
-    CANSparkMax[] sparkMaxes = { Arm.armController, Drivebase.leftSparkController, Drivebase.rightSparkController,
-        Intake.intakeController };
-    VictorSPX[] victors = { Drivebase.leftVictorController, Drivebase.rightVictorController };
+    // CANSparkMax[] sparkMaxes = { Arm.armController,
+    // Drivebase.leftSparkController, Drivebase.rightSparkController,
+    // Intake.intakeController };
+    // VictorSPX[] victors = { Drivebase.leftVictorController,
+    // Drivebase.rightVictorController };
 
-    for (CANSparkMax sm : sparkMaxes) {
-      sm.set(0.001);
+    // for (CANSparkMax sm : sparkMaxes) {
+    // sm.set(0.001);
 
-      if (sm.getAppliedOutput() < 0.0005) {
-        sparkFailure = true;
-      }
+    // if (sm.getAppliedOutput() < 0.0005) {
+    // sparkFailure = true;
+    // }
 
-      SmartDashboard.putNumber(sm.getDeviceId() + " Spark Velocity",
-          sm.getEncoder().getVelocity());
-      SmartDashboard.putNumber(sm.getDeviceId() + " Spark Temperature", sm.getMotorTemperature());
-    }
-    for (VictorSPX vs : victors) {
-      vs.set(ControlMode.PercentOutput, 0.0001);
+    // SmartDashboard.putNumber(sm.getDeviceId() + " Spark Velocity",
+    // sm.getEncoder().getVelocity());
+    // SmartDashboard.putNumber(sm.getDeviceId() + " Spark Temperature",
+    // sm.getMotorTemperature());
+    // }
+    // for (VictorSPX vs : victors) {
+    // vs.set(ControlMode.PercentOutput, 0.0001);
 
-      if (vs.getMotorOutputPercent() <= 0.0005) {
-        victorFailure = true;
-      }
+    // if (vs.getMotorOutputPercent() <= 0.0005) {
+    // victorFailure = true;
+    // }
 
-      SmartDashboard.putNumber(vs.getDeviceID() + " Victor Temperature",
-          vs.getTemperature());
-    }
+    // SmartDashboard.putNumber(vs.getDeviceID() + " Victor Temperature",
+    // vs.getTemperature());
+    // }
 
-    SmartDashboard.putBoolean("Spark Failure", sparkFailure);
-    SmartDashboard.putBoolean("Victor Failure", victorFailure);
+    // SmartDashboard.putBoolean("Spark Failure", sparkFailure);
+    // SmartDashboard.putBoolean("Victor Failure", victorFailure);
   }
 
   @Override
@@ -144,13 +147,13 @@ public class Robot extends TimedRobot {
     intake.update();
 
     // arm
-    // if (operatorController.getR2Button()) {
-    // arm.setState(ArmState.EXTENDED);
-    // } else if (operatorController.getL2Button()) {
-    // arm.setState(ArmState.RETRACTED);
-    // }
-    // arm.update();
-    arm.setPower(operatorController.getLeftY());
+    if (operatorController.getR1Button()) {
+      arm.setState(ArmState.EXTENDED);
+    } else if (operatorController.getL1Button()) {
+      arm.setState(ArmState.RETRACTED);
+    }
+    arm.update();
+    // arm.setPower(operatorController.getLeftY());
   }
 
   @Override
