@@ -17,6 +17,7 @@ import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.Arm.ArmState;
 //import frc.robot.subsystems.Arm.ArmState;
 import frc.robot.subsystems.Intake.IntakeState;
+import frc.robot.auton.AutonManager;
 import frc.robot.subsystems.Arm;
 
 /**
@@ -34,12 +35,14 @@ public class Robot extends TimedRobot {
   private String m_autoSelected;
   private final SendableChooser<String> m_chooser = new SendableChooser<>();
 
-  private PS4Controller driveController;
-  private PS4Controller operatorController;
+  private PS4Controller xyrir;
+  private PS4Controller theMegaladon;
   private String lastGP;
   private Drivebase drivebase;
   private Intake intake;
   private Arm arm;
+
+  private AutonManager autoManager;
 
   // private enum GamePiece {
   // CONE,
@@ -98,58 +101,62 @@ public class Robot extends TimedRobot {
   @Override
   public void autonomousInit() {
     m_autoSelected = m_chooser.getSelected();
-    // m_autoSelected = SmartDashboard.getString("Auto Selector", kDefaultAuto);
+    m_autoSelected = SmartDashboard.getString("Auto Selector", kDefaultAuto);
     System.out.println("Auto selected: " + m_autoSelected);
+
+    autoManager = new AutonManager();
   }
 
   @Override
   public void autonomousPeriodic() {
-    switch (m_autoSelected) {
-      case kCustomAuto:
-        // Put custom auto code here
-        break;
-      case kDefaultAuto:
-      default:
-        // Put default auto code here
-        break;
-    }
+    autoManager.runTheStuff();
+    // switch (m_autoSelected) {
+    // case kCustomAuto:
+    // // Put custom auto code here
+    // break;
+    // case kDefaultAuto:
+    // default:
+    // // Put default auto code here
+    // break;
+    // }
   }
 
   @Override
   public void teleopInit() {
-    driveController = new PS4Controller(0);
-    operatorController = new PS4Controller(1);
+    xyrir = new PS4Controller(0);
+    theMegaladon = new PS4Controller(1);
   }
 
   @Override
   public void teleopPeriodic() {
     // drive
-    drivebase.drive(-driveController.getLeftY(), driveController.getRightY());
+    drivebase.drive(-xyrir.getLeftY(), xyrir.getRightX());
+    drivebase.update();
 
     // intake
-    if (operatorController.getCircleButton()) {
+    if (theMegaladon.getCircleButton()) {
       intake.setState(IntakeState.INTAKE_CO);
       lastGP = "Cone";
-    } else if (operatorController.getTriangleButton()) {
+    } else if (theMegaladon.getTriangleButton()) {
       intake.setState(IntakeState.INTAKE_CU);
       lastGP = "Cube";
     } else if (lastGP == "Cone") {
       intake.setState(IntakeState.HOLD_CONE);
     } else if (lastGP == "Cube") {
       intake.setState(IntakeState.HOLD_CUBE);
-    } else if (operatorController.getSquareButton() & lastGP == "Cone") {
+    } else if (theMegaladon.getSquareButton() & lastGP == "Cone") {
       intake.setState(IntakeState.OUTAKE_CO);
-    } else if (operatorController.getSquareButton() & lastGP == "Cube") {
+    } else if (theMegaladon.getSquareButton() & lastGP == "Cube") {
       intake.setState(IntakeState.OUTAKE_CU);
-    } else if (operatorController.getSquareButton() & lastGP == null) {
+    } else if (theMegaladon.getSquareButton() & lastGP == null) {
       intake.setState(IntakeState.OFF);
     }
     intake.update();
 
     // arm
-    if (operatorController.getR1Button()) {
+    if (theMegaladon.getR1Button()) {
       arm.setState(ArmState.EXTENDED);
-    } else if (operatorController.getL1Button()) {
+    } else if (theMegaladon.getL1Button()) {
       arm.setState(ArmState.RETRACTED);
     }
     arm.update();

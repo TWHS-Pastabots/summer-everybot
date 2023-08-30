@@ -13,7 +13,7 @@ public class Arm {
     private static Arm instance;
     public static CANSparkMax armController;
     static final int ARM_CURRENT_LIMIT_A = 5;
-    static double ARM_OUTPUT_POWER = 1.6;
+    static double ARM_OUTPUT_POWER = 1.0;
     private ArmState state = ArmState.RETRACTED;
     private PIDController armPID = new PIDController(2.5, 1, 0.0);
     private double reqPosition = 7;
@@ -32,17 +32,6 @@ public class Arm {
         armController.burnFlash();
     }
 
-    public void setPower(double power) {
-        armController.set(power * ARM_OUTPUT_POWER);
-    }
-
-    public static Arm getInstance() {
-        if (instance == null) {
-            instance = new Arm();
-        }
-        return instance;
-    }
-
     public void update() {
         SmartDashboard.putNumber("ARM POSITION", armController.getEncoder().getPosition());
         if (state == ArmState.RETRACTED) {
@@ -52,15 +41,6 @@ public class Arm {
         }
 
         double reqPower = armPID.calculate(armController.getEncoder().getPosition(), reqPosition);
-
-        SmartDashboard.putNumber("Arm Requested Power", reqPower);
-
-        // armController.set(ARM_OUTPUT_POWER);
-        // if (state == ArmState.EXTENDED) {
-        // armController.set(ARM_OUTPUT_POWER);
-        // } else if (state == ArmState.RETRACTED) {
-        // armController.set(-ARM_OUTPUT_POWER);
-        // }
 
         armController.setVoltage(reqPower);
 
@@ -73,5 +53,12 @@ public class Arm {
 
     public void setState(ArmState state) {
         this.state = state;
+    }
+
+    public static Arm getInstance() {
+        if (instance == null) {
+            instance = new Arm();
+        }
+        return instance;
     }
 }

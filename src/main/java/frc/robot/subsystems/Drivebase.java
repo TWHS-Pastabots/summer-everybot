@@ -4,6 +4,9 @@ import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.kinematics.DifferentialDriveOdometry;
+import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import frc.robot.Ports;
 
 public class Drivebase {
@@ -12,8 +15,11 @@ public class Drivebase {
     public static CANSparkMax leftSparkController1;
     public static CANSparkMax leftSparkController2;
     private static Drivebase instance;
+    public static DifferentialDriveOdometry odometer;
+    public static Pose2d angle;
+    public Pose2d position;
 
-    private static final double MAX_SPEED = 0.75;
+    private static final double MAX_SPEED = 0.5;
 
     public Drivebase() {
         // Right motor group
@@ -37,15 +43,34 @@ public class Drivebase {
         leftSparkController2.setIdleMode(IdleMode.kBrake);
     }
 
-    public void drive(double left, double right) {
-        double leftSpeed = left * MAX_SPEED;
-        double rightSpeed = right * MAX_SPEED;
+    public void drive(double forward, double turn) {
+        double leftSpeed = (forward - turn) * MAX_SPEED;
+        double rightSpeed = (forward + turn) * MAX_SPEED;
 
         leftSparkController1.set(leftSpeed);
         leftSparkController2.set(leftSpeed);
 
         rightSparkController1.set(rightSpeed);
         rightSparkController2.set(rightSpeed);
+    }
+
+    public void update() {
+        angle.getRotation().fromDegrees(0);
+
+        double rotationsR = rightSparkController1.getEncoder().getPosition();
+        double distanceR = rotationsR * ((Math.PI) * 3);
+
+        double rotationsL = leftSparkController1.getEncoder().getPosition();
+        double distanceL = rotationsL * ((Math.PI) * 3);
+
+        odometer = new DifferentialDriveOdometry(angle.getRotation(), distanceL, distanceR);
+        position = odometer.getPoseMeters();
+    }
+
+    public void autoDrive(double distance, double speed) {
+        while (position.getY() < position.getY() + distance) {
+            drive(speed, 0);
+        }
     }
 
     public static Drivebase getInstance() {
