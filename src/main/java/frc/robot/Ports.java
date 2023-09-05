@@ -7,4 +7,5 @@ public class Ports {
     public static final int LEFT_SPARK1 = 1;
     public static final int ARM = 5;
     public static final int INTAKE = 6;
+    public static final int ARM_LOWER = 7;
 }

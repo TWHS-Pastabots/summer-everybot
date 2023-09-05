@@ -11,12 +11,13 @@ import frc.robot.Ports;
 
 public class Arm {
     private static Arm instance;
-    public static CANSparkMax armController;
-    static final int ARM_CURRENT_LIMIT_A = 5;
-    static double ARM_OUTPUT_POWER = 1.0;
+
     private ArmState state = ArmState.RETRACTED;
     private PIDController armPID = new PIDController(2.5, 1, 0.0);
     private double reqPosition = 7;
+
+    private static CANSparkMax armController;
+    private static CANSparkMax lowerArmController;
 
     public enum ArmState {
         RETRACTED,
@@ -25,11 +26,17 @@ public class Arm {
 
     public Arm() {
         armController = new CANSparkMax(Ports.ARM, MotorType.kBrushless);
+        lowerArmController = new CANSparkMax(Ports.ARM_LOWER, MotorType.kBrushless);
 
         armController.setInverted(false);
         armController.setIdleMode(IdleMode.kBrake);
-        armController.setSmartCurrentLimit(ARM_CURRENT_LIMIT_A);
+        armController.setSmartCurrentLimit(25);
         armController.burnFlash();
+
+        lowerArmController.setInverted(false);
+        lowerArmController.setIdleMode(IdleMode.kBrake);
+        lowerArmController.setSmartCurrentLimit(25);
+        lowerArmController.burnFlash();
     }
 
     public void update() {
@@ -43,12 +50,6 @@ public class Arm {
         double reqPower = armPID.calculate(armController.getEncoder().getPosition(), reqPosition);
 
         armController.setVoltage(reqPower);
-
-        if (state == ArmState.RETRACTED && armController.getEncoder().getPosition() > reqPosition) {
-            armController.setVoltage(0.0);
-        } else if (state == ArmState.EXTENDED && armController.getEncoder().getPosition() < reqPosition) {
-            armController.setVoltage(0.0);
-        }
     }
 
     public void setState(ArmState state) {
