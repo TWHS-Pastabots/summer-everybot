@@ -1,22 +1,20 @@
 package frc.robot.auton.commands;
 
-import frc.robot.auton.Command;
 import frc.robot.subsystems.*;
 import frc.robot.subsystems.Arm.ArmState;
 import frc.robot.subsystems.Intake.IntakeState;
 
-public class Ansh extends Command {
+import edu.wpi.first.wpilibj2.command.*;
+
+public class Ansh extends CommandBase {
     private Drivebase drivebase;
     private Arm arm;
     private Intake intake;
 
-    public Ansh() {
-        drivebase = Drivebase.getInstance();
-        arm = Arm.getInstance();
-    }
-
     @Override
     public void initialize() {
+        drivebase = Drivebase.getInstance();
+        arm = Arm.getInstance();
     }
 
     @Override
