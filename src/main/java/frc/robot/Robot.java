@@ -69,6 +69,8 @@ public class Robot extends TimedRobot {
     System.out.println("Auto selected: " + m_autoSelected);
 
     anshton = new Anshton();
+
+    anshton.initialize();
   }
 
   @Override
@@ -95,7 +97,7 @@ public class Robot extends TimedRobot {
   public void teleopPeriodic() {
     // drive
     drivebase.drive(-driver.getLeftY(), driver.getRightX());
-    drivebase.update();
+    // drivebase.update();
 
     // intake
     intake.update(operator.getCircleButton(), operator.getTriangleButton(), operator.getSquareButton());
@@ -108,12 +110,13 @@ public class Robot extends TimedRobot {
     }
 
     // if (operator.getR2Button()) {
-    // arm.setLowerState(LowerArmState.GROUND_INTAKE_DOWN);
+    // arm.setState();
     // } else if (operator.getL2Button()) {
-    // arm.setLowerState(LowerArmState.GROUND_INTAKE_UP);
+    // arm.setState();
     // }
 
     arm.update();
+    arm.setLowPower(operator.getLeftY());
 
   }
 

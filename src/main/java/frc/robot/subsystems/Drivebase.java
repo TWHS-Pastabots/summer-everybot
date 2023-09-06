@@ -53,8 +53,19 @@ public class Drivebase {
         rightSparkController2.set(rightSpeed);
     }
 
-    public void update() {
-    }
+    // public void update() {
+    // angle.getRotation().fromDegrees(0);
+
+    // double rotationsR = rightSparkController1.getEncoder().getPosition();
+    // double distanceR = rotationsR * ((Math.PI) * 3);
+
+    // double rotationsL = leftSparkController1.getEncoder().getPosition();
+    // double distanceL = rotationsL * ((Math.PI) * 3);
+
+    // odometer = new DifferentialDriveOdometry(angle.getRotation(), distanceL,
+    // distanceR);
+    // position = odometer.getPoseMeters();
+    // }
 
     public void autoDrive(double distance, double speed) {
         while (position.getY() < position.getY() + distance) {

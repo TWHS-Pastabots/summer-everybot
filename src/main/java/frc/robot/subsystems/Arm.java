@@ -12,7 +12,7 @@ public class Arm {
 
     private ArmState state = ArmState.RETRACTED;
     private PIDController armPID = new PIDController(2.5, 1, 0.0);
-    private PIDController lowerArmPID = new PIDController(0.0, 0.0, 0.0);
+    private PIDController lowerArmPID = new PIDController(1.0, 0.0, 0.0);
 
     private static CANSparkMax armController;
     private static CANSparkMax leftlowArmController;
@@ -52,6 +52,7 @@ public class Arm {
         leftlowArmController.burnFlash();
 
         // check inverted
+        rightlowArmController.setInverted(false);
         rightlowArmController.setIdleMode(IdleMode.kBrake);
         rightlowArmController.setSmartCurrentLimit(25);
         rightlowArmController.burnFlash();
@@ -63,16 +64,22 @@ public class Arm {
         double reqPowerU = armPID.calculate(armController.getEncoder().getPosition(), state.poseU);
         double reqpowerL = lowerArmPID.calculate(leftlowArmController.getEncoder().getPosition(), state.poseL);
 
-        SmartDashboard.putNumber("INTAKE POSITION", leftlowArmController.getEncoder().getPosition());
+        SmartDashboard.putNumber("LOWER ARM POSITION LEFT", leftlowArmController.getEncoder().getPosition());
+        SmartDashboard.putNumber("LOWER ARM POSITION right", rightlowArmController.getEncoder().getPosition());
 
         // leftlowArmController.setVoltage(reqpowerL);
         // rightlowArmController.follow(leftlowArmController, true);
 
-        armController.setVoltage(reqPowerU);
+        // armController.setVoltage(reqPowerU);
     }
 
     public void setState(ArmState state) {
         this.state = state;
+    }
+
+    public void setLowPower(double power) {
+        leftlowArmController.set(power * 0.75);
+        rightlowArmController.set(power * 0.75);
     }
 
     // public void setLowerState(LowerArmState lowstate) {

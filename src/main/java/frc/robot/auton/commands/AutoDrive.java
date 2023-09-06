@@ -28,7 +28,7 @@ public class AutoDrive extends CommandBase {
 
   @Override
   public void initialize() {
-    drivebase = new Drivebase();
+    drivebase = Drivebase.getInstance();
     time = Timer.getFPGATimestamp();
     endTime += time;
   }
