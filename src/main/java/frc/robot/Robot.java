@@ -15,8 +15,9 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.subsystems.Drivebase;
 import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.Arm.ArmState;
-import frc.robot.auton.AutonManager;
+import frc.robot.subsystems.Arm.LowerArmState;
 import frc.robot.subsystems.Arm;
+import frc.robot.auton.sequences.*;
 
 /**
  * The VM is configured to automatically run this class, and to call the
@@ -35,12 +36,12 @@ public class Robot extends TimedRobot {
 
   private PS4Controller driver;
   private PS4Controller operator;
-  private String lastGP;
+  // private String lastGP;
   private Drivebase drivebase;
   private Intake intake;
   private Arm arm;
 
-  private AutonManager autoManager;
+  private Anshton anshton;
 
   // private enum GamePiece {
   // CONE,
@@ -67,12 +68,12 @@ public class Robot extends TimedRobot {
     m_autoSelected = SmartDashboard.getString("Auto Selector", kDefaultAuto);
     System.out.println("Auto selected: " + m_autoSelected);
 
-    autoManager = new AutonManager();
+    anshton = new Anshton();
   }
 
   @Override
   public void autonomousPeriodic() {
-    autoManager.runTheStuff();
+    anshton.execute();
     // switch (m_autoSelected) {
     // case kCustomAuto:
     // // Put custom auto code here
@@ -105,7 +106,15 @@ public class Robot extends TimedRobot {
     } else if (operator.getL1Button()) {
       arm.setState(ArmState.RETRACTED);
     }
+
+    // if (operator.getR2Button()) {
+    // arm.setLowerState(LowerArmState.GROUND_INTAKE_DOWN);
+    // } else if (operator.getL2Button()) {
+    // arm.setLowerState(LowerArmState.GROUND_INTAKE_UP);
+    // }
+
     arm.update();
+
   }
 
   @Override

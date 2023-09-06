@@ -13,18 +13,26 @@ public class Arm {
     private ArmState state = ArmState.RETRACTED;
     private PIDController armPID = new PIDController(2.5, 1, 0.0);
     private PIDController lowerArmPID = new PIDController(0.0, 0.0, 0.0);
-    private double reqPositionU = 7;
-    private double reqPositionL = 4;
 
     private static CANSparkMax armController;
     private static CANSparkMax leftlowArmController;
     private static CANSparkMax rightlowArmController;
 
     public enum ArmState {
-        RETRACTED,
-        EXTENDED,
+        RETRACTED(14, 6),
+        EXTENDED(-18, 2);
+
+        public final double poseU, poseL;
+
+        private ArmState(double poseU, double poseL) {
+            this.poseU = poseU;
+            this.poseL = poseL;
+        }
+    }
+
+    public enum LowerArmState {
         GROUND_INTAKE_DOWN,
-        GROUND_INTAKE_UP
+        GROUND_INTAKE_UP,
     }
 
     public Arm() {
@@ -38,13 +46,12 @@ public class Arm {
         armController.burnFlash();
 
         // check inverted
-        leftlowArmController.setInverted(false);
+        leftlowArmController.setInverted(true);
         leftlowArmController.setIdleMode(IdleMode.kBrake);
         leftlowArmController.setSmartCurrentLimit(25);
         leftlowArmController.burnFlash();
 
         // check inverted
-        rightlowArmController.setInverted(false);
         rightlowArmController.setIdleMode(IdleMode.kBrake);
         rightlowArmController.setSmartCurrentLimit(25);
         rightlowArmController.burnFlash();
@@ -52,24 +59,14 @@ public class Arm {
 
     public void update() {
         SmartDashboard.putNumber("ARM POSITION", armController.getEncoder().getPosition());
-        if (state == ArmState.RETRACTED) {
-            reqPositionU = 14;
-        } else if (state == ArmState.EXTENDED) {
-            reqPositionU = -18;
-        }
 
-        double reqPowerU = armPID.calculate(armController.getEncoder().getPosition(), reqPositionU);
-        double reqpowerL = lowerArmPID.calculate(leftlowArmController.getEncoder().getPosition(), reqPositionL);
+        double reqPowerU = armPID.calculate(armController.getEncoder().getPosition(), state.poseU);
+        double reqpowerL = lowerArmPID.calculate(leftlowArmController.getEncoder().getPosition(), state.poseL);
 
         SmartDashboard.putNumber("INTAKE POSITION", leftlowArmController.getEncoder().getPosition());
-        if (state == ArmState.GROUND_INTAKE_DOWN) {
-            reqPositionL = 6;
-        } else if (state == ArmState.GROUND_INTAKE_UP) {
-            reqPositionL = 2;
-        }
 
-        leftlowArmController.setVoltage(reqpowerL);
-        rightlowArmController.setVoltage(reqpowerL);
+        // leftlowArmController.setVoltage(reqpowerL);
+        // rightlowArmController.follow(leftlowArmController, true);
 
         armController.setVoltage(reqPowerU);
     }
@@ -77,6 +74,10 @@ public class Arm {
     public void setState(ArmState state) {
         this.state = state;
     }
+
+    // public void setLowerState(LowerArmState lowstate) {
+    // this.lowstate = lowstate;
+    // }
 
     public static Arm getInstance() {
         if (instance == null) {
