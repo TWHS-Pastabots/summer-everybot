@@ -3,8 +3,6 @@ package frc.robot.subsystems;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
-
-//import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Ports;
@@ -14,42 +12,66 @@ public class Arm {
 
     private ArmState state = ArmState.RETRACTED;
     private PIDController armPID = new PIDController(2.5, 1, 0.0);
-    private double reqPosition = 7;
+    private PIDController lowerArmPID = new PIDController(0.0, 0.0, 0.0);
+    private double reqPositionU = 7;
+    private double reqPositionL = 4;
 
     private static CANSparkMax armController;
-    private static CANSparkMax lowerArmController;
+    private static CANSparkMax leftlowArmController;
+    private static CANSparkMax rightlowArmController;
 
     public enum ArmState {
         RETRACTED,
         EXTENDED,
+        GROUND_INTAKE_DOWN,
+        GROUND_INTAKE_UP
     }
 
     public Arm() {
         armController = new CANSparkMax(Ports.ARM, MotorType.kBrushless);
-        lowerArmController = new CANSparkMax(Ports.ARM_LOWER, MotorType.kBrushless);
+        leftlowArmController = new CANSparkMax(Ports.ARM_LOWER_LEFT, MotorType.kBrushless);
+        rightlowArmController = new CANSparkMax(Ports.ARM_LOWER_RIGHT, MotorType.kBrushless);
 
         armController.setInverted(false);
         armController.setIdleMode(IdleMode.kBrake);
         armController.setSmartCurrentLimit(25);
         armController.burnFlash();
 
-        lowerArmController.setInverted(false);
-        lowerArmController.setIdleMode(IdleMode.kBrake);
-        lowerArmController.setSmartCurrentLimit(25);
-        lowerArmController.burnFlash();
+        // check inverted
+        leftlowArmController.setInverted(false);
+        leftlowArmController.setIdleMode(IdleMode.kBrake);
+        leftlowArmController.setSmartCurrentLimit(25);
+        leftlowArmController.burnFlash();
+
+        // check inverted
+        rightlowArmController.setInverted(false);
+        rightlowArmController.setIdleMode(IdleMode.kBrake);
+        rightlowArmController.setSmartCurrentLimit(25);
+        rightlowArmController.burnFlash();
     }
 
     public void update() {
         SmartDashboard.putNumber("ARM POSITION", armController.getEncoder().getPosition());
         if (state == ArmState.RETRACTED) {
-            reqPosition = 14;
+            reqPositionU = 14;
         } else if (state == ArmState.EXTENDED) {
-            reqPosition = -18;
+            reqPositionU = -18;
         }
 
-        double reqPower = armPID.calculate(armController.getEncoder().getPosition(), reqPosition);
+        double reqPowerU = armPID.calculate(armController.getEncoder().getPosition(), reqPositionU);
+        double reqpowerL = lowerArmPID.calculate(leftlowArmController.getEncoder().getPosition(), reqPositionL);
 
-        armController.setVoltage(reqPower);
+        SmartDashboard.putNumber("INTAKE POSITION", leftlowArmController.getEncoder().getPosition());
+        if (state == ArmState.GROUND_INTAKE_DOWN) {
+            reqPositionL = 6;
+        } else if (state == ArmState.GROUND_INTAKE_UP) {
+            reqPositionL = 2;
+        }
+
+        leftlowArmController.setVoltage(reqpowerL);
+        rightlowArmController.setVoltage(reqpowerL);
+
+        armController.setVoltage(reqPowerU);
     }
 
     public void setState(ArmState state) {

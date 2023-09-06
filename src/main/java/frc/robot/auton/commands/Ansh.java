@@ -2,7 +2,6 @@ package frc.robot.auton.commands;
 
 import frc.robot.subsystems.*;
 import frc.robot.subsystems.Arm.ArmState;
-import frc.robot.subsystems.Intake.IntakeState;
 
 import edu.wpi.first.wpilibj2.command.*;
 
