@@ -15,7 +15,6 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.subsystems.Drivebase;
 import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.Arm.ArmState;
-import frc.robot.subsystems.Arm.LowerArmState;
 import frc.robot.subsystems.Arm;
 import frc.robot.auton.sequences.*;
 
@@ -109,14 +108,14 @@ public class Robot extends TimedRobot {
       arm.setState(ArmState.RETRACTED);
     }
 
+    // lower arm
     // if (operator.getR2Button()) {
-    // arm.setState();
+    // arm.setState(ArmState.EXTENDED);
     // } else if (operator.getL2Button()) {
-    // arm.setState();
+    // arm.setState(ArmState.RETRACTED);
     // }
 
-    arm.update();
-    arm.setLowPower(operator.getLeftY());
+    arm.update(operator.getRightY());
 
   }
 
