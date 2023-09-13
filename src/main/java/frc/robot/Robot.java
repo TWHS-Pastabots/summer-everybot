@@ -95,7 +95,9 @@ public class Robot extends TimedRobot {
   @Override
   public void teleopPeriodic() {
     // drive
-    drivebase.drive(-driver.getLeftY(), driver.getRightX());
+    drivebase.drive(-driver.getRightY(), driver.getLeftX());
+    SmartDashboard.putNumber("Forward", driver.getRightY());
+    SmartDashboard.putNumber("Turn", driver.getLeftX());
     // drivebase.update();
 
     // intake
@@ -113,6 +115,13 @@ public class Robot extends TimedRobot {
     // arm.setState(ArmState.EXTENDED);
     // } else if (operator.getL2Button()) {
     // arm.setState(ArmState.RETRACTED);
+    // }
+
+    // if(operator.getOptionsButton())
+    // {
+    // arm.setState(ArmState.TEST2);
+    // }else if(operator.getShareButton()){
+    // arm.setState(ArmState.TEST1);
     // }
 
     arm.update(operator.getRightY());

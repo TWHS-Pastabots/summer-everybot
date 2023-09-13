@@ -1,11 +1,9 @@
 package frc.robot.subsystems;
 
 import com.revrobotics.CANSparkMax;
-import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.kinematics.DifferentialDriveOdometry;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Ports;
 
 public class Drivebase {
@@ -14,63 +12,45 @@ public class Drivebase {
     public static CANSparkMax leftSparkController1;
     public static CANSparkMax leftSparkController2;
     private static Drivebase instance;
-    public static DifferentialDriveOdometry odometer;
-    public static Pose2d angle;
-    public Pose2d position;
 
-    private static final double MAX_SPEED = 0.5;
+    private static final double MAX_SPEED = 1;
 
     public Drivebase() {
         // Right motor group
 
         rightSparkController1 = new CANSparkMax(Ports.RIGHT_SPARK1, MotorType.kBrushed);
-        rightSparkController1.setInverted(true);
-        rightSparkController1.setIdleMode(IdleMode.kBrake);
+        rightSparkController1.setSmartCurrentLimit(25);
+        rightSparkController1.burnFlash();
 
         rightSparkController2 = new CANSparkMax(Ports.RIGHT_SPARK2, MotorType.kBrushed);
-        rightSparkController2.setInverted(true);
-        rightSparkController2.setIdleMode(IdleMode.kBrake);
+        rightSparkController2.setSmartCurrentLimit(25);
+        rightSparkController2.burnFlash();
 
         // Left motor group
 
         leftSparkController1 = new CANSparkMax(Ports.LEFT_SPARK1, MotorType.kBrushed);
-        leftSparkController1.setInverted(true);
-        leftSparkController1.setIdleMode(IdleMode.kBrake);
+        leftSparkController1.setSmartCurrentLimit(25);
+        leftSparkController1.burnFlash();
 
         leftSparkController2 = new CANSparkMax(Ports.LEFT_SPARK2, MotorType.kBrushed);
-        leftSparkController2.setInverted(true);
-        leftSparkController2.setIdleMode(IdleMode.kBrake);
+        leftSparkController2.setSmartCurrentLimit(25);
+        leftSparkController2.burnFlash();
     }
 
     public void drive(double forward, double turn) {
-        double leftSpeed = (forward - turn) * MAX_SPEED;
-        double rightSpeed = (forward + turn) * MAX_SPEED;
+        double leftSpeed = (forward - turn) * MAX_SPEED * 12;
+        double rightSpeed = (forward + turn) * MAX_SPEED * 12;
 
-        leftSparkController1.set(leftSpeed);
-        leftSparkController2.set(leftSpeed);
+        leftSparkController1.setVoltage(leftSpeed);
+        leftSparkController2.setVoltage(leftSpeed);
 
-        rightSparkController1.set(rightSpeed);
-        rightSparkController2.set(rightSpeed);
-    }
+        rightSparkController1.setVoltage(rightSpeed);
+        rightSparkController2.setVoltage(rightSpeed);
 
-    // public void update() {
-    // angle.getRotation().fromDegrees(0);
-
-    // double rotationsR = rightSparkController1.getEncoder().getPosition();
-    // double distanceR = rotationsR * ((Math.PI) * 3);
-
-    // double rotationsL = leftSparkController1.getEncoder().getPosition();
-    // double distanceL = rotationsL * ((Math.PI) * 3);
-
-    // odometer = new DifferentialDriveOdometry(angle.getRotation(), distanceL,
-    // distanceR);
-    // position = odometer.getPoseMeters();
-    // }
-
-    public void autoDrive(double distance, double speed) {
-        while (position.getY() < position.getY() + distance) {
-            drive(speed, 0);
-        }
+        SmartDashboard.putNumber("Left Spark 1", leftSparkController1.getEncoder().getVelocity());
+        SmartDashboard.putNumber("Left Spark 2", leftSparkController2.getEncoder().getVelocity());
+        SmartDashboard.putNumber("Right Spark 1", rightSparkController1.getEncoder().getVelocity());
+        SmartDashboard.putNumber("Right Spark 2", rightSparkController2.getEncoder().getVelocity());
     }
 
     public static Drivebase getInstance() {

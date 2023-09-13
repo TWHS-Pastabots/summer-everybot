@@ -20,7 +20,9 @@ public class Arm {
 
     public enum ArmState {
         RETRACTED(14, 6),
-        EXTENDED(-18, 2);
+        EXTENDED(-18, 2),
+        TEST1(-2, 8),
+        TEST2(-2, 4);
 
         public final double poseU, poseL;
 
@@ -47,36 +49,37 @@ public class Arm {
 
         // check inverted
         leftlowArmController.setInverted(false);
-        leftlowArmController.setIdleMode(IdleMode.kBrake);
-        leftlowArmController.setSmartCurrentLimit(25);
         leftlowArmController.burnFlash();
 
         // check inverted
         rightlowArmController.setInverted(true);
-        rightlowArmController.setIdleMode(IdleMode.kBrake);
-        rightlowArmController.setSmartCurrentLimit(25);
         rightlowArmController.burnFlash();
     }
+
+    private static final double MAX_V_L = 2;
 
     public void update(double lowerPower) {
         SmartDashboard.putNumber("ARM POSITION", armController.getEncoder().getPosition());
 
         // double reqPowerU = armPID.calculate(armController.getEncoder().getPosition(),
         // state.poseU);
-        // double reqpowerL =
+        double reqpowerL = lowerPower * 2;
         // lowerArmPID.calculate(leftlowArmController.getEncoder().getPosition(),
         // state.poseL);
 
         SmartDashboard.putNumber("LOWER ARM POSITION LEFT", leftlowArmController.getEncoder().getPosition());
-        SmartDashboard.putNumber("LOWER ARM POSITION right", rightlowArmController.getEncoder().getPosition());
+        SmartDashboard.putNumber("LOWER ARM POSITION RIGHT", rightlowArmController.getEncoder().getPosition());
 
         // leftlowArmController.setVoltage(reqpowerL * 0.2);
         // rightlowArmController.follow(leftlowArmController, true);
 
         // armController.setVoltage(reqPowerU);
 
-        // leftlowArmController.setVoltage(lowerPower * 0.1);
-        rightlowArmController.setVoltage(lowerPower * 0.1);
+        reqpowerL = Math.max(-MAX_V_L, reqpowerL);
+        reqpowerL = Math.min(MAX_V_L, reqpowerL);
+
+        leftlowArmController.setVoltage(reqpowerL);
+        rightlowArmController.setVoltage(reqpowerL);
     }
 
     public void setState(ArmState state) {
