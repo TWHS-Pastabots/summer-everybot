@@ -14,6 +14,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.subsystems.Drivebase;
 import frc.robot.subsystems.Intake;
+import frc.robot.subsystems.Arm.ArmControl;
 import frc.robot.subsystems.Arm.ArmState;
 import frc.robot.subsystems.Arm;
 import frc.robot.auton.sequences.*;
@@ -104,6 +105,14 @@ public class Robot extends TimedRobot {
     intake.update(operator.getCircleButton(), operator.getTriangleButton(), operator.getSquareButton());
 
     // arm
+
+    // manual
+    if (operator.getShareButton()) {
+      if (operator.getR2Axis()) {
+        arm.setControlState(ArmControl.MANUAL);
+      }
+    }
+
     if (operator.getR1Button()) {
       arm.setState(ArmState.EXTENDED);
     } else if (operator.getL1Button()) {
@@ -111,18 +120,17 @@ public class Robot extends TimedRobot {
     }
 
     // lower arm
-    // if (operator.getR2Button()) {
-    // arm.setState(ArmState.EXTENDED);
-    // } else if (operator.getL2Button()) {
-    // arm.setState(ArmState.RETRACTED);
-    // }
+    if (operator.getR2Button()) {
+      arm.setState(ArmState.GROUND_INTAKE);
+    } else if (operator.getL2Button()) {
+      arm.setState(ArmState.SCORE);
+    }
 
-    // if(operator.getOptionsButton())
-    // {
-    // arm.setState(ArmState.TEST2);
-    // }else if(operator.getShareButton()){
-    // arm.setState(ArmState.TEST1);
-    // }
+    if (operator.getOptionsButton()) {
+      arm.setState(ArmState.TEST2);
+    } else if (operator.getShareButton()) {
+      arm.setState(ArmState.TEST1);
+    }
 
     arm.update(operator.getRightY());
 
