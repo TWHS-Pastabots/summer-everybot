@@ -4,10 +4,7 @@
 
 package frc.robot;
 
-//import com.ctre.phoenix.motorcontrol.ControlMode;
-//import com.ctre.phoenix.motorcontrol.can.VictorSPX;
-//import com.revrobotics.CANSparkMax;
-
+import edu.wpi.first.hal.simulation.RoboRioDataJNI;
 import edu.wpi.first.wpilibj.PS4Controller;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
@@ -16,6 +13,8 @@ import frc.robot.subsystems.Drivebase;
 import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.Arm.ArmControl;
 import frc.robot.subsystems.Arm.ArmState;
+import frc.robot.subsystems.Arm.ControlSpeed;
+import frc.robot.subsystems.Intake.IntakeState;
 import frc.robot.subsystems.Arm;
 import frc.robot.auton.sequences.*;
 
@@ -36,17 +35,14 @@ public class Robot extends TimedRobot {
 
   private PS4Controller driver;
   private PS4Controller operator;
-  // private String lastGP;
+
   private Drivebase drivebase;
   private Intake intake;
   private Arm arm;
 
   private Anshton anshton;
 
-  // private enum GamePiece {
-  // CONE,
-  // CUBE
-  // }
+  private boolean manualArm = true;
 
   @Override
   public void robotInit() {
@@ -60,6 +56,8 @@ public class Robot extends TimedRobot {
 
   @Override
   public void robotPeriodic() {
+    SmartDashboard.putNumber("RIO Current", RoboRioDataJNI.getVInCurrent());
+    SmartDashboard.putNumber("RIO Voltage", RoboRioDataJNI.getVInVoltage());
   }
 
   @Override
@@ -76,15 +74,6 @@ public class Robot extends TimedRobot {
   @Override
   public void autonomousPeriodic() {
     anshton.execute();
-    // switch (m_autoSelected) {
-    // case kCustomAuto:
-    // // Put custom auto code here
-    // break;
-    // case kDefaultAuto:
-    // default:
-    // // Put default auto code here
-    // break;
-    // }
   }
 
   @Override
@@ -96,44 +85,51 @@ public class Robot extends TimedRobot {
   @Override
   public void teleopPeriodic() {
     // drive
-    drivebase.drive(-driver.getRightY(), driver.getLeftX());
+    drivebase.drive(driver.getRightY(), driver.getLeftY());
     SmartDashboard.putNumber("Forward", driver.getRightY());
     SmartDashboard.putNumber("Turn", driver.getLeftX());
-    // drivebase.update();
 
     // intake
-    intake.update(operator.getCircleButton(), operator.getTriangleButton(), operator.getSquareButton());
+
+    intake.update(operator.getTriangleButton(), operator.getSquareButton(), operator.getCircleButton());
+
+    if (operator.getL1Button()) {
+      intake.setState(IntakeState.HOLD_CONE);
+    }
+
 
     // arm
 
-    // manual
-    if (operator.getShareButton()) {
-      if (operator.getR2Axis()) {
-        arm.setControlState(ArmControl.MANUAL);
-      }
+    if (operator.getL1Button()) {
+      arm.setControlSpeed(ControlSpeed.FINE);
+    }else{
+      arm.setControlSpeed(ControlSpeed.FULL);
     }
 
-    if (operator.getR1Button()) {
-      arm.setState(ArmState.EXTENDED);
-    } else if (operator.getL1Button()) {
-      arm.setState(ArmState.RETRACTED);
+    // manual
+    if (operator.getShareButtonPressed()) {
+      manualArm = true;
+    } else if (operator.getOptionsButtonPressed()) {
+    manualArm = false;
+    }
+
+    if (manualArm) {
+      arm.setControlState(ArmControl.MANUAL);
+      arm.update(operator.getLeftY(), operator.getRightY());
+    } else {
+    arm.setControlState(ArmControl.PID);
+
+    if (operator.getR2Button()) {
+    arm.setState(ArmState.EXTENDED);
+    } else if (operator.getL2Button()) {
+    arm.setState(ArmState.RETRACTED);
     }
 
     // lower arm
-    if (operator.getR2Button()) {
-      arm.setState(ArmState.GROUND_INTAKE);
-    } else if (operator.getL2Button()) {
-      arm.setState(ArmState.SCORE);
+    if (operator.getR1Button()) {
+    arm.setState(ArmState.GROUND_INTAKE);
+    } 
     }
-
-    if (operator.getOptionsButton()) {
-      arm.setState(ArmState.TEST2);
-    } else if (operator.getShareButton()) {
-      arm.setState(ArmState.TEST1);
-    }
-
-    arm.update(operator.getRightY());
-
   }
 
   @Override

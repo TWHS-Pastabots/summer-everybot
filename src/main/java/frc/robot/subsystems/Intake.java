@@ -11,12 +11,12 @@ public class Intake {
     private IntakeState state;
     private GamePiece lastGamePiece;
 
-    private static final double INTAKE_OUTPUT_POWER = 1.0;
-    private static final double INTAKE_HOLD_POWER = -0.1;
+    private static final double INTAKE_OUTPUT_POWER = .75;
+    private static final double INTAKE_HOLD_POWER = -0.03;
 
     public static CANSparkMax intakeController;
 
-    private enum IntakeState {
+    public enum IntakeState {
         INTAKE_CUBE,
         INTAKE_CONE,
         HOLD_CONE,
@@ -56,8 +56,8 @@ public class Intake {
             setState(IntakeState.OUTAKE_CONE);
         } else if (outtake && lastGamePiece == GamePiece.CUBE) {
             setState(IntakeState.OUTAKE_CUBE);
-        } else if (lastGamePiece == GamePiece.CONE) {
-            setState(IntakeState.HOLD_CONE);
+        // } else if (lastGamePiece == GamePiece.CONE) {
+        //     setState(IntakeState.HOLD_CONE);
         } else if (lastGamePiece == GamePiece.CUBE) {
             setState(IntakeState.HOLD_CUBE);
         }
@@ -66,22 +66,28 @@ public class Intake {
     public void update(boolean intakeCone, boolean intakeCube, boolean outtake) {
         updateState(intakeCone, intakeCube, outtake);
 
-        if (state == IntakeState.OFF)
+        if (state == IntakeState.OFF){
             intakeController.set(0.0);
+        }
         else if (state == IntakeState.INTAKE_CONE) {
             intakeController.set(INTAKE_OUTPUT_POWER);
             lastGamePiece = GamePiece.CONE;
-        } else if (state == IntakeState.INTAKE_CUBE) {
+        } 
+        else if (state == IntakeState.INTAKE_CUBE) {
             intakeController.set(-INTAKE_OUTPUT_POWER);
             lastGamePiece = GamePiece.CUBE;
-        } else if (state == IntakeState.HOLD_CONE) {
+        } 
+        else if (state == IntakeState.HOLD_CONE) {
             intakeController.set(INTAKE_HOLD_POWER);
-        } else if (state == IntakeState.HOLD_CUBE) {
+        } 
+        else if (state == IntakeState.HOLD_CUBE) {
             intakeController.set(-INTAKE_HOLD_POWER);
-        } else if (state == IntakeState.OUTAKE_CONE) {
+        } 
+        else if (state == IntakeState.OUTAKE_CONE) {
             intakeController.set(-INTAKE_OUTPUT_POWER);
             lastGamePiece = GamePiece.NONE;
-        } else if (state == IntakeState.OUTAKE_CUBE) {
+        } 
+        else if (state == IntakeState.OUTAKE_CUBE) {
             intakeController.set(INTAKE_OUTPUT_POWER);
             lastGamePiece = GamePiece.NONE;
         }

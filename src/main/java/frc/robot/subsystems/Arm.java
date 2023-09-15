@@ -1,7 +1,6 @@
 package frc.robot.subsystems;
 
 import com.revrobotics.CANSparkMax;
-import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -11,21 +10,21 @@ public class Arm {
     private static Arm instance;
 
     private ArmState state = ArmState.RETRACTED;
-    private ArmControl cstate = ArmControl.PID;
+    private ArmControl cstate = ArmControl.MANUAL;
+    private ControlSpeed sstate = ControlSpeed.FULL;
+    private double speed = 1.0;
+    private double tippingPoint = 8.0; 
+
     private PIDController armPID = new PIDController(2.5, 1, 0.0);
     private PIDController lowerArmPID = new PIDController(1.0, 0.0, 0.0);
 
     private static CANSparkMax armController;
-    private static CANSparkMax leftlowArmController;
-    private static CANSparkMax rightlowArmController;
+    private static CANSparkMax lowArmController;
 
     public enum ArmState {
         RETRACTED(14, 6),
         EXTENDED(-18, 2),
-        GROUND_INTAKE(1, 2),
-        SCORE(14, 1),
-        TEST1(-2, 8),
-        TEST2(-2, 4);
+        GROUND_INTAKE(1, 2);
 
         public final double poseU, poseL;
 
@@ -40,51 +39,67 @@ public class Arm {
         PID;
     }
 
+    public enum ControlSpeed{
+        FINE,
+        FULL;
+    }
+
     public Arm() {
+
         armController = new CANSparkMax(Ports.ARM, MotorType.kBrushless);
-        leftlowArmController = new CANSparkMax(Ports.ARM_LOWER_LEFT, MotorType.kBrushless);
-        rightlowArmController = new CANSparkMax(Ports.ARM_LOWER_RIGHT, MotorType.kBrushless);
+        lowArmController = new CANSparkMax(Ports.LOWER_ARM, MotorType.kBrushless);
 
         armController.setInverted(false);
-        armController.setIdleMode(IdleMode.kBrake);
-        armController.setSmartCurrentLimit(25);
         armController.burnFlash();
 
-        rightlowArmController.setInverted(true);
-        rightlowArmController.burnFlash();
+        lowArmController.setInverted(true);
+        lowArmController.burnFlash();
     }
 
     private static final double MAX_V_L = 2;
 
-    public void update(double lowerPower, double upperpower) {
+    public void update(double lowerPower, double upperPower) {
+
         SmartDashboard.putNumber("ARM POSITION", armController.getEncoder().getPosition());
 
-        if (cstate == ArmControl.MANUAL) {
-            armController.setVoltage(upperpower);
-            rightlowArmController.setVoltage(lowerPower);
+        if (sstate == ControlSpeed.FINE){
+            speed = 0.5;
+        } else{
+            speed = 1.0;
         }
 
-        if (cstate == ArmControl.PID) {
-            double reqPowerU = armPID.calculate(armController.getEncoder().getPosition(),
-                    state.poseU);
-            double reqPowerL = lowerPower * 2;
-            lowerArmPID.calculate(leftlowArmController.getEncoder().getPosition(),
-                    state.poseL);
+        if (cstate == ArmControl.MANUAL) {
 
-            SmartDashboard.putNumber("LOWER ARM POSITION LEFT", leftlowArmController.getEncoder().getPosition());
-            SmartDashboard.putNumber("LOWER ARM POSITION RIGHT", rightlowArmController.getEncoder().getPosition());
+            armController.set(upperPower * speed);
+            lowArmController.set(lowerPower * speed);
 
-            leftlowArmController.setVoltage(reqPowerL * 0.2);
-            rightlowArmController.follow(leftlowArmController, true);
+        }
 
+            double reqPowerU = armPID.calculate(armController.getEncoder().getPosition(), state.poseU);
+            double reqPowerL = lowerArmPID.calculate(lowArmController.getEncoder().getPosition(), state.poseL);
+
+            SmartDashboard.putNumber("LOWER ARM POSITION LEFT",
+                    lowArmController.getEncoder().getPosition());
+            SmartDashboard.putNumber("LOWER ARM POSITION RIGHT",
+                    lowArmController.getEncoder().getPosition());
+
+            
+            reqPowerU = (Math.max(-MAX_V_L, reqPowerU)) * speed;
+            reqPowerU = (Math.min(MAX_V_L, reqPowerU)) * speed;
+
+            if (cstate == ArmControl.PID) {
             armController.setVoltage(reqPowerU);
 
-            reqPowerL = Math.max(-MAX_V_L, reqPowerL);
-            reqPowerL = Math.min(MAX_V_L, reqPowerL);
+            reqPowerL = (Math.max(-MAX_V_L, reqPowerL)) * speed;
+            reqPowerL = (Math.min(MAX_V_L, reqPowerL)) * speed;
 
-            leftlowArmController.setVoltage(reqPowerL);
-            rightlowArmController.setVoltage(reqPowerL);
+            // lowArmController.setVoltage(reqPowerL);
         }
+
+        // if( armPosition() > tippingPoint && Drivebase.isDriving()) {
+        //     setState(ArmState.RETRACTED);
+        // }
+
     }
 
     public void setState(ArmState state) {
@@ -93,6 +108,14 @@ public class Arm {
 
     public void setControlState(ArmControl cstate) {
         this.cstate = cstate;
+    }
+
+    public void setControlSpeed(ControlSpeed sstate) {
+        this.sstate = sstate;
+    }
+
+    public double armPosition() {
+        return armController.getEncoder().getPosition();
     }
 
     public static Arm getInstance() {
