@@ -87,7 +87,7 @@ public class Robot extends TimedRobot {
     public void teleopPeriodic() {
         // drive
 
-        if (driver.getL1Button()) {
+        if (driver.getSquareButton()) {
             drivebase.setDriveSpeed(DriveSpeed.SLOW);
         } else {
             drivebase.setDriveSpeed(DriveSpeed.FULL);

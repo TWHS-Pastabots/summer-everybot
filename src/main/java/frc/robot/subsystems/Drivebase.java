@@ -16,6 +16,7 @@ public class Drivebase {
     private static Drivebase instance;
 
     private static double MAX_SPEED = 0.5;
+    private static double MIN_SPEED = 0.25;
 
     public enum DriveSpeed {
         SLOW,
@@ -49,8 +50,8 @@ public class Drivebase {
     public void drive(double right, double left) {
 
         if (sstate == DriveSpeed.SLOW) {
-            MAX_SPEED = 0.25;
-        } else {
+            MIN_SPEED = 0.25;
+        } else{
             MAX_SPEED = 0.5;
         }
 
