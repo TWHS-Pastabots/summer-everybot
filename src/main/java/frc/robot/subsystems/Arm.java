@@ -12,14 +12,15 @@ public class Arm {
     private ArmState state = ArmState.RETRACTED;
     private ArmControl cstate = ArmControl.MANUAL;
     private ControlSpeed sstate = ControlSpeed.FULL;
-    private double speed = 1.0;
-    private double tippingPoint = 8.0; 
 
     private PIDController armPID = new PIDController(2.5, 1, 0.0);
     private PIDController lowerArmPID = new PIDController(1.0, 0.0, 0.0);
 
     private static CANSparkMax armController;
     private static CANSparkMax lowArmController;
+
+    private double MAX_SPEED = 1.0;
+    private double tippingPoint = 8.0; 
 
     public enum ArmState {
         RETRACTED(14, 6),
@@ -63,15 +64,15 @@ public class Arm {
         SmartDashboard.putNumber("ARM POSITION", armController.getEncoder().getPosition());
 
         if (sstate == ControlSpeed.FINE){
-            speed = 0.5;
+            MAX_SPEED = 0.5;
         } else{
-            speed = 1.0;
+            MAX_SPEED = 1.0;
         }
 
         if (cstate == ArmControl.MANUAL) {
 
-            armController.set(upperPower * speed);
-            lowArmController.set(lowerPower * speed);
+            armController.set(upperPower * MAX_SPEED);
+            lowArmController.set(lowerPower * MAX_SPEED);
 
         }
 
@@ -84,21 +85,22 @@ public class Arm {
                     lowArmController.getEncoder().getPosition());
 
             
-            reqPowerU = (Math.max(-MAX_V_L, reqPowerU)) * speed;
-            reqPowerU = (Math.min(MAX_V_L, reqPowerU)) * speed;
+            reqPowerU = (Math.max(-MAX_V_L, reqPowerU)) * MAX_SPEED;
+            reqPowerU = (Math.min(MAX_V_L, reqPowerU)) * MAX_SPEED;
 
             if (cstate == ArmControl.PID) {
             armController.setVoltage(reqPowerU);
 
-            reqPowerL = (Math.max(-MAX_V_L, reqPowerL)) * speed;
-            reqPowerL = (Math.min(MAX_V_L, reqPowerL)) * speed;
+            reqPowerL = (Math.max(-MAX_V_L, reqPowerL)) * MAX_SPEED;
+            reqPowerL = (Math.min(MAX_V_L, reqPowerL)) * MAX_SPEED;
 
             // lowArmController.setVoltage(reqPowerL);
         }
 
-        // if( armPosition() > tippingPoint && Drivebase.isDriving()) {
-        //     setState(ArmState.RETRACTED);
-        // }
+        //stability
+        if (armPosition() > tippingPoint && Drivebase.isDriving()) {
+            setState(ArmState.RETRACTED);
+        }
 
     }
 

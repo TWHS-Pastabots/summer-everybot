@@ -14,6 +14,7 @@ import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.Arm.ArmControl;
 import frc.robot.subsystems.Arm.ArmState;
 import frc.robot.subsystems.Arm.ControlSpeed;
+import frc.robot.subsystems.Drivebase.DriveSpeed;
 import frc.robot.subsystems.Intake.IntakeState;
 import frc.robot.subsystems.Arm;
 import frc.robot.auton.sequences.*;
@@ -85,6 +86,13 @@ public class Robot extends TimedRobot {
   @Override
   public void teleopPeriodic() {
     // drive
+
+    if(driver.getL1Button()){
+      drivebase.setDriveSpeed(DriveSpeed.SLOW);
+    } else{
+      drivebase.setDriveSpeed(DriveSpeed.FULL);
+    }
+
     drivebase.drive(driver.getRightY(), driver.getLeftY());
     SmartDashboard.putNumber("Forward", driver.getRightY());
     SmartDashboard.putNumber("Turn", driver.getLeftX());
@@ -117,6 +125,7 @@ public class Robot extends TimedRobot {
       arm.setControlState(ArmControl.MANUAL);
       arm.update(operator.getLeftY(), operator.getRightY());
     } else {
+    //PID
     arm.setControlState(ArmControl.PID);
 
     if (operator.getR2Button()) {
