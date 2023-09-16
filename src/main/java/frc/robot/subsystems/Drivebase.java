@@ -6,7 +6,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Ports;
 
 public class Drivebase {
-    
+
     private DriveSpeed sstate = DriveSpeed.FULL;
 
     private static CANSparkMax rightSparkController1;
@@ -14,10 +14,10 @@ public class Drivebase {
     private static CANSparkMax leftSparkController1;
     private static CANSparkMax leftSparkController2;
     private static Drivebase instance;
- 
+
     private static double MAX_SPEED = 0.5;
 
-    public enum DriveSpeed{
+    public enum DriveSpeed {
         SLOW,
         FULL;
     }
@@ -25,7 +25,7 @@ public class Drivebase {
     public Drivebase() {
         // Right motor group
 
-        //smart current limit only works on brushless motors
+        // smart current limit only works on brushless motors
         rightSparkController1 = new CANSparkMax(Ports.RIGHT_SPARK1, MotorType.kBrushed);
         rightSparkController1.setInverted(true);
         rightSparkController1.burnFlash();
@@ -48,9 +48,9 @@ public class Drivebase {
 
     public void drive(double right, double left) {
 
-        if (sstate == DriveSpeed.SLOW){
+        if (sstate == DriveSpeed.SLOW) {
             MAX_SPEED = 0.25;
-        } else{
+        } else {
             MAX_SPEED = 0.5;
         }
 
@@ -70,16 +70,15 @@ public class Drivebase {
         SmartDashboard.putString("ANSH", "ANSH");
     }
 
-    public void setDriveSpeed(DriveSpeed sstate){
+    public void setDriveSpeed(DriveSpeed sstate) {
         this.sstate = sstate;
     }
 
     public static boolean isDriving() {
-        if ( leftSparkController1.getAppliedOutput() != 0 || leftSparkController2.getAppliedOutput() != 0 
-        || rightSparkController1.getAppliedOutput() != 0 || rightSparkController2.getAppliedOutput() != 0) {
+        if (leftSparkController1.getAppliedOutput() != 0 || leftSparkController2.getAppliedOutput() != 0
+                || rightSparkController1.getAppliedOutput() != 0 || rightSparkController2.getAppliedOutput() != 0) {
             return true;
-        }
-        else{
+        } else {
             return false;
         }
     }

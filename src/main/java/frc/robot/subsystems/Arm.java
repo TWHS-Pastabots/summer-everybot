@@ -20,7 +20,7 @@ public class Arm {
     private static CANSparkMax lowArmController;
 
     private double MAX_SPEED = 1.0;
-    private double tippingPoint = 8.0; 
+    private double tippingPoint = 8.0;
 
     public enum ArmState {
         RETRACTED(14, 6),
@@ -40,7 +40,7 @@ public class Arm {
         PID;
     }
 
-    public enum ControlSpeed{
+    public enum ControlSpeed {
         FINE,
         FULL;
     }
@@ -63,9 +63,9 @@ public class Arm {
 
         SmartDashboard.putNumber("ARM POSITION", armController.getEncoder().getPosition());
 
-        if (sstate == ControlSpeed.FINE){
+        if (sstate == ControlSpeed.FINE) {
             MAX_SPEED = 0.5;
-        } else{
+        } else {
             MAX_SPEED = 1.0;
         }
 
@@ -76,19 +76,18 @@ public class Arm {
 
         }
 
-            double reqPowerU = armPID.calculate(armController.getEncoder().getPosition(), state.poseU);
-            double reqPowerL = lowerArmPID.calculate(lowArmController.getEncoder().getPosition(), state.poseL);
+        double reqPowerU = armPID.calculate(armController.getEncoder().getPosition(), state.poseU);
+        double reqPowerL = lowerArmPID.calculate(lowArmController.getEncoder().getPosition(), state.poseL);
 
-            SmartDashboard.putNumber("LOWER ARM POSITION LEFT",
-                    lowArmController.getEncoder().getPosition());
-            SmartDashboard.putNumber("LOWER ARM POSITION RIGHT",
-                    lowArmController.getEncoder().getPosition());
+        SmartDashboard.putNumber("LOWER ARM POSITION LEFT",
+                lowArmController.getEncoder().getPosition());
+        SmartDashboard.putNumber("LOWER ARM POSITION RIGHT",
+                lowArmController.getEncoder().getPosition());
 
-            
-            reqPowerU = (Math.max(-MAX_V_L, reqPowerU)) * MAX_SPEED;
-            reqPowerU = (Math.min(MAX_V_L, reqPowerU)) * MAX_SPEED;
+        reqPowerU = (Math.max(-MAX_V_L, reqPowerU)) * MAX_SPEED;
+        reqPowerU = (Math.min(MAX_V_L, reqPowerU)) * MAX_SPEED;
 
-            if (cstate == ArmControl.PID) {
+        if (cstate == ArmControl.PID) {
             armController.setVoltage(reqPowerU);
 
             reqPowerL = (Math.max(-MAX_V_L, reqPowerL)) * MAX_SPEED;
@@ -97,7 +96,7 @@ public class Arm {
             // lowArmController.setVoltage(reqPowerL);
         }
 
-        //stability
+        // stability
         if (armPosition() > tippingPoint && Drivebase.isDriving()) {
             setState(ArmState.RETRACTED);
         }

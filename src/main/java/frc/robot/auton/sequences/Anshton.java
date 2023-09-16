@@ -4,9 +4,9 @@ import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.auton.commands.AutoDrive;
 
 public class Anshton extends SequentialCommandGroup {
-  /** Creates a new Anshton. */
-  public Anshton() {
- 
-    addCommands(new AutoDrive(1));
-  }
+    /** Creates a new Anshton. */
+    public Anshton() {
+
+        addCommands(new AutoDrive(1));
+    }
 }

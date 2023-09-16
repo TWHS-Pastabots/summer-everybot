@@ -29,131 +29,130 @@ import frc.robot.auton.sequences.*;
  * project.
  */
 public class Robot extends TimedRobot {
-  private static final String kDefaultAuto = "Default";
-  private static final String kCustomAuto = "My Auto";
-  private String m_autoSelected;
-  private final SendableChooser<String> m_chooser = new SendableChooser<>();
+    private static final String kDefaultAuto = "Default";
+    private static final String kCustomAuto = "My Auto";
+    private String m_autoSelected;
+    private final SendableChooser<String> m_chooser = new SendableChooser<>();
 
-  private PS4Controller driver;
-  private PS4Controller operator;
+    private PS4Controller driver;
+    private PS4Controller operator;
 
-  private Drivebase drivebase;
-  private Intake intake;
-  private Arm arm;
+    private Drivebase drivebase;
+    private Intake intake;
+    private Arm arm;
 
-  private Anshton anshton;
+    private Anshton anshton;
 
-  private boolean manualArm = true;
+    private boolean manualArm = true;
 
-  @Override
-  public void robotInit() {
-    m_chooser.setDefaultOption("Default Auto", kDefaultAuto);
-    m_chooser.addOption("My Auto", kCustomAuto);
+    @Override
+    public void robotInit() {
+        m_chooser.setDefaultOption("Default Auto", kDefaultAuto);
+        m_chooser.addOption("My Auto", kCustomAuto);
 
-    drivebase = Drivebase.getInstance();
-    intake = Intake.getInstance();
-    arm = Arm.getInstance();
-  }
-
-  @Override
-  public void robotPeriodic() {
-    SmartDashboard.putNumber("RIO Current", RoboRioDataJNI.getVInCurrent());
-    SmartDashboard.putNumber("RIO Voltage", RoboRioDataJNI.getVInVoltage());
-  }
-
-  @Override
-  public void autonomousInit() {
-    m_autoSelected = m_chooser.getSelected();
-    m_autoSelected = SmartDashboard.getString("Auto Selector", kDefaultAuto);
-    System.out.println("Auto selected: " + m_autoSelected);
-
-    anshton = new Anshton();
-
-    anshton.initialize();
-  }
-
-  @Override
-  public void autonomousPeriodic() {
-    anshton.execute();
-  }
-
-  @Override
-  public void teleopInit() {
-    driver = new PS4Controller(0);
-    operator = new PS4Controller(1);
-  }
-
-  @Override
-  public void teleopPeriodic() {
-    // drive
-
-    if(driver.getL1Button()){
-      drivebase.setDriveSpeed(DriveSpeed.SLOW);
-    } else{
-      drivebase.setDriveSpeed(DriveSpeed.FULL);
+        drivebase = Drivebase.getInstance();
+        intake = Intake.getInstance();
+        arm = Arm.getInstance();
     }
 
-    drivebase.drive(driver.getRightY(), driver.getLeftY());
-    SmartDashboard.putNumber("Forward", driver.getRightY());
-    SmartDashboard.putNumber("Turn", driver.getLeftX());
-
-    // intake
-
-    intake.update(operator.getTriangleButton(), operator.getSquareButton(), operator.getCircleButton());
-
-    if (operator.getL1Button()) {
-      intake.setState(IntakeState.HOLD_CONE);
+    @Override
+    public void robotPeriodic() {
+        SmartDashboard.putNumber("RIO Current", RoboRioDataJNI.getVInCurrent());
+        SmartDashboard.putNumber("RIO Voltage", RoboRioDataJNI.getVInVoltage());
     }
 
+    @Override
+    public void autonomousInit() {
+        m_autoSelected = m_chooser.getSelected();
+        m_autoSelected = SmartDashboard.getString("Auto Selector", kDefaultAuto);
+        System.out.println("Auto selected: " + m_autoSelected);
 
-    // arm
+        anshton = new Anshton();
 
-    if (operator.getL1Button()) {
-      arm.setControlSpeed(ControlSpeed.FINE);
-    }else{
-      arm.setControlSpeed(ControlSpeed.FULL);
+        anshton.initialize();
     }
 
-    // manual
-    if (operator.getShareButtonPressed()) {
-      manualArm = true;
-    } else if (operator.getOptionsButtonPressed()) {
-    manualArm = false;
+    @Override
+    public void autonomousPeriodic() {
+        anshton.execute();
     }
 
-    if (manualArm) {
-      arm.setControlState(ArmControl.MANUAL);
-      arm.update(operator.getLeftY(), operator.getRightY());
-    } else {
-    //PID
-    arm.setControlState(ArmControl.PID);
-
-    if (operator.getR2Button()) {
-    arm.setState(ArmState.EXTENDED);
-    } else if (operator.getL2Button()) {
-    arm.setState(ArmState.RETRACTED);
+    @Override
+    public void teleopInit() {
+        driver = new PS4Controller(0);
+        operator = new PS4Controller(1);
     }
 
-    // lower arm
-    if (operator.getR1Button()) {
-    arm.setState(ArmState.GROUND_INTAKE);
-    } 
+    @Override
+    public void teleopPeriodic() {
+        // drive
+
+        if (driver.getL1Button()) {
+            drivebase.setDriveSpeed(DriveSpeed.SLOW);
+        } else {
+            drivebase.setDriveSpeed(DriveSpeed.FULL);
+        }
+
+        drivebase.drive(driver.getRightY(), driver.getLeftY());
+        SmartDashboard.putNumber("Forward", driver.getRightY());
+        SmartDashboard.putNumber("Turn", driver.getLeftX());
+
+        // intake
+
+        intake.update(operator.getTriangleButton(), operator.getSquareButton(), operator.getCircleButton());
+
+        if (operator.getL1Button()) {
+            intake.setState(IntakeState.HOLD_CONE);
+        }
+
+        // arm
+
+        if (operator.getL1Button()) {
+            arm.setControlSpeed(ControlSpeed.FINE);
+        } else {
+            arm.setControlSpeed(ControlSpeed.FULL);
+        }
+
+        // manual
+        if (operator.getShareButtonPressed()) {
+            manualArm = true;
+        } else if (operator.getOptionsButtonPressed()) {
+            manualArm = false;
+        }
+
+        if (manualArm) {
+            arm.setControlState(ArmControl.MANUAL);
+            arm.update(operator.getLeftY(), operator.getRightY());
+        } else {
+            // PID
+            arm.setControlState(ArmControl.PID);
+
+            if (operator.getR2Button()) {
+                arm.setState(ArmState.EXTENDED);
+            } else if (operator.getL2Button()) {
+                arm.setState(ArmState.RETRACTED);
+            }
+
+            // lower arm
+            if (operator.getR1Button()) {
+                arm.setState(ArmState.GROUND_INTAKE);
+            }
+        }
     }
-  }
 
-  @Override
-  public void disabledInit() {
-  }
+    @Override
+    public void disabledInit() {
+    }
 
-  @Override
-  public void disabledPeriodic() {
-  }
+    @Override
+    public void disabledPeriodic() {
+    }
 
-  @Override
-  public void testInit() {
-  }
+    @Override
+    public void testInit() {
+    }
 
-  @Override
-  public void testPeriodic() {
-  }
+    @Override
+    public void testPeriodic() {
+    }
 }
