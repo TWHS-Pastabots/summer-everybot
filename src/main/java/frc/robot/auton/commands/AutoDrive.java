@@ -7,8 +7,6 @@ import frc.robot.subsystems.Drivebase;
 public class AutoDrive extends CommandBase {
     private Drivebase drivebase;
 
-    private final double power = 0.5;
-
     private double time;
     private double turn;
     private double endTime;
@@ -35,9 +33,9 @@ public class AutoDrive extends CommandBase {
 
     @Override
     public void execute() {
-        drivebase.drive(power, turn);
+        drivebase.drive(1, turn);
 
-        if (time > endTime) {
+        if (time >= endTime) {
             ended = true;
         }
     }

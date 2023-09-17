@@ -4,23 +4,24 @@ import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import frc.robot.Misc;
 import frc.robot.Ports;
 
 public class Arm {
     private static Arm instance;
 
-    private ArmState state = ArmState.RETRACTED;
-    private ArmControl cstate = ArmControl.MANUAL;
-    private ControlSpeed sstate = ControlSpeed.FULL;
+    private ArmControl controlState = ArmControl.MANUAL;
+    private ControlSpeed controlSpeed = ControlSpeed.FULL;
 
     private PIDController armPID = new PIDController(2.5, 1, 0.0);
     private PIDController lowerArmPID = new PIDController(1.0, 0.0, 0.0);
 
-    private static CANSparkMax armController;
-    private static CANSparkMax lowArmController;
+    private CANSparkMax armController;
+    private CANSparkMax lowArmController;
 
-    private double MAX_SPEED = 1.0;
-    private double tippingPoint = 8.0;
+    private static final double MAX_VOLTS = 2;
+
+    public ArmState state = ArmState.RETRACTED;
 
     public enum ArmState {
         RETRACTED(14, 6),
@@ -33,20 +34,33 @@ public class Arm {
             this.poseU = poseU;
             this.poseL = poseL;
         }
+
+        public final ArmState next() {
+            return values()[(ordinal() + 1) % values().length];
+        }
+
+        public final ArmState prev() {
+            return values()[(ordinal() - 1 + values().length) % values().length];
+        }
     }
 
     public enum ArmControl {
         MANUAL,
-        PID;
+        PID,
     }
 
     public enum ControlSpeed {
-        FINE,
-        FULL;
+        FINE(0.5),
+        FULL(1.0);
+
+        public final double speed;
+
+        private ControlSpeed(double speed) {
+            this.speed = speed;
+        }
     }
 
     public Arm() {
-
         armController = new CANSparkMax(Ports.ARM, MotorType.kBrushless);
         lowArmController = new CANSparkMax(Ports.LOWER_ARM, MotorType.kBrushless);
 
@@ -57,65 +71,38 @@ public class Arm {
         lowArmController.burnFlash();
     }
 
-    private static final double MAX_V_L = 2;
-
     public void update(double lowerPower, double upperPower) {
-
         SmartDashboard.putNumber("ARM POSITION", armController.getEncoder().getPosition());
+        SmartDashboard.putNumber("LOWER ARM POSITION", lowArmController.getEncoder().getPosition());
 
-        if (sstate == ControlSpeed.FINE) {
-            MAX_SPEED = 0.5;
-        } else {
-            MAX_SPEED = 1.0;
+        if (controlState == ArmControl.MANUAL) {
+            armController.set(upperPower * controlSpeed.speed);
+            lowArmController.set(lowerPower * controlSpeed.speed);
+        } else if (controlState == ArmControl.PID) {
+            double reqPowerUpper = armPID.calculate(armController.getEncoder().getPosition(), state.poseU);
+            double reqPowerLower = lowerArmPID.calculate(lowArmController.getEncoder().getPosition(), state.poseL);
+
+            reqPowerUpper = Misc.clamp(reqPowerUpper, -MAX_VOLTS, MAX_VOLTS);
+            reqPowerLower = Misc.clamp(reqPowerLower, -MAX_VOLTS, MAX_VOLTS);
+
+            armController.setVoltage(reqPowerUpper);
+            lowArmController.setVoltage(reqPowerLower);
         }
-
-        if (cstate == ArmControl.MANUAL) {
-
-            armController.set(upperPower * MAX_SPEED);
-            lowArmController.set(lowerPower * MAX_SPEED);
-
-        }
-
-        double reqPowerU = armPID.calculate(armController.getEncoder().getPosition(), state.poseU);
-        double reqPowerL = lowerArmPID.calculate(lowArmController.getEncoder().getPosition(), state.poseL);
-
-        SmartDashboard.putNumber("LOWER ARM POSITION LEFT",
-                lowArmController.getEncoder().getPosition());
-        SmartDashboard.putNumber("LOWER ARM POSITION RIGHT",
-                lowArmController.getEncoder().getPosition());
-
-        reqPowerU = (Math.max(-MAX_V_L, reqPowerU)) * MAX_SPEED;
-        reqPowerU = (Math.min(MAX_V_L, reqPowerU)) * MAX_SPEED;
-
-        if (cstate == ArmControl.PID) {
-            armController.setVoltage(reqPowerU);
-
-            reqPowerL = (Math.max(-MAX_V_L, reqPowerL)) * MAX_SPEED;
-            reqPowerL = (Math.min(MAX_V_L, reqPowerL)) * MAX_SPEED;
-
-            // lowArmController.setVoltage(reqPowerL);
-        }
-
-        // stability
-        if (armPosition() > tippingPoint && Drivebase.isDriving()) {
-            setState(ArmState.RETRACTED);
-        }
-
     }
 
     public void setState(ArmState state) {
         this.state = state;
     }
 
-    public void setControlState(ArmControl cstate) {
-        this.cstate = cstate;
+    public void setControlState(ArmControl controlState) {
+        this.controlState = controlState;
     }
 
-    public void setControlSpeed(ControlSpeed sstate) {
-        this.sstate = sstate;
+    public void setControlSpeed(ControlSpeed controlSpeed) {
+        this.controlSpeed = controlSpeed;
     }
 
-    public double armPosition() {
+    public double getArmPose() {
         return armController.getEncoder().getPosition();
     }
 
