@@ -101,13 +101,11 @@ public class Robot extends TimedRobot {
         }
 
         // manage arm PID states & update
-        // logic for whether or not the PID/manual mode actually runs is in Arm.java
+        // the logic for whether or not the PID/manual mode actually runs is in Arm.java
         if (operator.getR2Button()) {
-            arm.setState(ArmState.EXTENDED);
+            arm.setState(arm.state.next());
         } else if (operator.getL2Button()) {
-            arm.setState(ArmState.RETRACTED);
-        } else if (operator.getR1Button()) {
-            arm.setState(ArmState.GROUND_INTAKE);
+            arm.setState(arm.state.prev());
         }
         arm.update(operator.getLeftY(), operator.getRightY());
     }

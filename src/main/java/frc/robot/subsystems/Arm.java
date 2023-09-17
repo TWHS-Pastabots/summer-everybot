@@ -10,7 +10,6 @@ import frc.robot.Ports;
 public class Arm {
     private static Arm instance;
 
-    private ArmState state = ArmState.RETRACTED;
     private ArmControl controlState = ArmControl.MANUAL;
     private ControlSpeed controlSpeed = ControlSpeed.FULL;
 
@@ -22,6 +21,8 @@ public class Arm {
 
     private static final double MAX_VOLTS = 2;
 
+    public ArmState state = ArmState.RETRACTED;
+
     public enum ArmState {
         RETRACTED(14, 6),
         EXTENDED(-18, 2),
@@ -32,6 +33,14 @@ public class Arm {
         private ArmState(double poseU, double poseL) {
             this.poseU = poseU;
             this.poseL = poseL;
+        }
+
+        public final ArmState next() {
+            return values()[(ordinal() + 1) % values().length];
+        }
+
+        public final ArmState prev() {
+            return values()[(ordinal() - 1 + values().length) % values().length];
         }
     }
 
