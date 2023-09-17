@@ -4,18 +4,14 @@
 
 package frc.robot;
 
-import edu.wpi.first.hal.simulation.RoboRioDataJNI;
 import edu.wpi.first.wpilibj.PS4Controller;
 import edu.wpi.first.wpilibj.TimedRobot;
-import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.subsystems.Drivebase;
 import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.Arm.ArmControl;
 import frc.robot.subsystems.Arm.ArmState;
 import frc.robot.subsystems.Arm.ControlSpeed;
 import frc.robot.subsystems.Drivebase.DriveSpeed;
-import frc.robot.subsystems.Intake.IntakeState;
 import frc.robot.subsystems.Arm;
 import frc.robot.auton.sequences.*;
 
@@ -29,11 +25,6 @@ import frc.robot.auton.sequences.*;
  * project.
  */
 public class Robot extends TimedRobot {
-    private static final String kDefaultAuto = "Default";
-    private static final String kCustomAuto = "My Auto";
-    private String m_autoSelected;
-    private final SendableChooser<String> m_chooser = new SendableChooser<>();
-
     private PS4Controller driver;
     private PS4Controller operator;
 
@@ -43,13 +34,8 @@ public class Robot extends TimedRobot {
 
     private Anshton anshton;
 
-    private boolean manualArm = true;
-
     @Override
     public void robotInit() {
-        m_chooser.setDefaultOption("Default Auto", kDefaultAuto);
-        m_chooser.addOption("My Auto", kCustomAuto);
-
         drivebase = Drivebase.getInstance();
         intake = Intake.getInstance();
         arm = Arm.getInstance();
@@ -57,18 +43,11 @@ public class Robot extends TimedRobot {
 
     @Override
     public void robotPeriodic() {
-        SmartDashboard.putNumber("RIO Current", RoboRioDataJNI.getVInCurrent());
-        SmartDashboard.putNumber("RIO Voltage", RoboRioDataJNI.getVInVoltage());
     }
 
     @Override
     public void autonomousInit() {
-        m_autoSelected = m_chooser.getSelected();
-        m_autoSelected = SmartDashboard.getString("Auto Selector", kDefaultAuto);
-        System.out.println("Auto selected: " + m_autoSelected);
-
         anshton = new Anshton();
-
         anshton.initialize();
     }
 
@@ -85,59 +64,52 @@ public class Robot extends TimedRobot {
 
     @Override
     public void teleopPeriodic() {
-        // drive
+        /* Drive Controls */
 
-        if (driver.getL1Button()) {
+        // slow driving while holding square
+        if (driver.getSquareButton()) {
             drivebase.setDriveSpeed(DriveSpeed.SLOW);
         } else {
             drivebase.setDriveSpeed(DriveSpeed.FULL);
         }
 
-        drivebase.drive(driver.getRightY(), driver.getLeftY());
-        SmartDashboard.putNumber("Forward", driver.getRightY());
-        SmartDashboard.putNumber("Turn", driver.getLeftX());
+        drivebase.drive(driver.getRightY(), driver.getLeftX());
 
-        // intake
+        /* Intake Controls */
 
-        intake.update(operator.getTriangleButton(), operator.getSquareButton(), operator.getCircleButton());
+        // separate these into different variables for readability
+        boolean intakeCone = operator.getTriangleButton();
+        boolean intakeCube = operator.getSquareButton();
+        boolean outtake = operator.getCircleButton();
 
-        if (operator.getL1Button()) {
-            intake.setState(IntakeState.HOLD_CONE);
-        }
+        intake.update(intakeCone, intakeCube, outtake);
 
-        // arm
+        /* Arm Controls */
 
+        // finer control when holding L1
         if (operator.getL1Button()) {
             arm.setControlSpeed(ControlSpeed.FINE);
         } else {
             arm.setControlSpeed(ControlSpeed.FULL);
         }
 
-        // manual
+        // manage arm control states
         if (operator.getShareButtonPressed()) {
-            manualArm = true;
-        } else if (operator.getOptionsButtonPressed()) {
-            manualArm = false;
-        }
-
-        if (manualArm) {
             arm.setControlState(ArmControl.MANUAL);
-            arm.update(operator.getLeftY(), operator.getRightY());
-        } else {
-            // PID
+        } else if (operator.getOptionsButtonPressed()) {
             arm.setControlState(ArmControl.PID);
-
-            if (operator.getR2Button()) {
-                arm.setState(ArmState.EXTENDED);
-            } else if (operator.getL2Button()) {
-                arm.setState(ArmState.RETRACTED);
-            }
-
-            // lower arm
-            if (operator.getR1Button()) {
-                arm.setState(ArmState.GROUND_INTAKE);
-            }
         }
+
+        // manage arm PID states & update
+        // logic for whether or not the PID/manual mode actually runs is in Arm.java
+        if (operator.getR2Button()) {
+            arm.setState(ArmState.EXTENDED);
+        } else if (operator.getL2Button()) {
+            arm.setState(ArmState.RETRACTED);
+        } else if (operator.getR1Button()) {
+            arm.setState(ArmState.GROUND_INTAKE);
+        }
+        arm.update(operator.getLeftY(), operator.getRightY());
     }
 
     @Override

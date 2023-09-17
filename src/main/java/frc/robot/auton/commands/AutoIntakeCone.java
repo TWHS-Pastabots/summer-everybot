@@ -23,16 +23,16 @@ public class AutoIntakeCone extends CommandBase {
 
     @Override
     public void execute() {
-
         intake.update(true, false, false);
 
-        if (time == endTime) {
+        if (time >= endTime) {
             ended = true;
         }
     }
 
     @Override
     public void end(boolean interrupted) {
+        intake.update(false, false, false);
     }
 
     @Override
