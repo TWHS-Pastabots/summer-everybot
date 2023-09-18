@@ -6,10 +6,10 @@ import com.revrobotics.CANSparkMax.IdleMode;
 import frc.robot.Ports;
 
 public class Intake {
-    private static Intake m_instance;
+    private static Intake instance;
 
     private IntakeState state;
-    private GamePiece lastGamePiece;
+    private static GamePiece lastGamePiece;
 
     private enum GamePiece {
         NONE,
@@ -27,8 +27,8 @@ public class Intake {
         INTAKE_CONE(INTAKE_OUTPUT_POWER, GamePiece.CONE),
         HOLD_CONE(INTAKE_HOLD_POWER, GamePiece.CONE),
         HOLD_CUBE(-INTAKE_HOLD_POWER, GamePiece.CUBE),
-        OUTAKE_CONE(-INTAKE_OUTPUT_POWER, GamePiece.NONE),
-        OUTAKE_CUBE(INTAKE_OUTPUT_POWER, GamePiece.NONE),
+        OUTAKE_CONE(-INTAKE_OUTPUT_POWER, lastGamePiece),
+        OUTAKE_CUBE(INTAKE_OUTPUT_POWER, lastGamePiece),
         OFF(0.0, GamePiece.NONE);
 
         public final double power;
@@ -79,9 +79,9 @@ public class Intake {
     }
 
     public static Intake getInstance() {
-        if (m_instance == null) {
-            m_instance = new Intake();
+        if (instance == null) {
+            instance = new Intake();
         }
-        return m_instance;
+        return instance;
     }
 }
