@@ -23,7 +23,7 @@ public class AutoIntakeCube extends CommandBase {
 
     @Override
     public void execute() {
-        intake.update(false, false, true);
+        intake.update(false, true);
 
         if (time == endTime) {
             ended = true;
@@ -32,7 +32,7 @@ public class AutoIntakeCube extends CommandBase {
 
     @Override
     public void end(boolean interrupted) {
-        intake.update(false, false, false);
+        intake.update(false, false);
     }
 
     @Override

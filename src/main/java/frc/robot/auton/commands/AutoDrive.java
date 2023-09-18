@@ -9,14 +9,16 @@ public class AutoDrive extends CommandBase {
 
     private double time;
     private double turn;
+    private double forward;
     private double endTime;
 
     private boolean ended = false;
 
     /** Creates a new AutoDrive. */
-    public AutoDrive(double time, double turn) {
+    public AutoDrive(double forward, double turn, double time) {
         endTime = time;
         this.turn = turn;
+        this.forward = -forward;
     }
 
     public AutoDrive(double time) {
@@ -33,7 +35,8 @@ public class AutoDrive extends CommandBase {
 
     @Override
     public void execute() {
-        drivebase.drive(1, turn);
+        drivebase.drive(forward, turn);
+        time = Timer.getFPGATimestamp();
 
         if (time >= endTime) {
             ended = true;

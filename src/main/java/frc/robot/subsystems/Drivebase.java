@@ -59,10 +59,14 @@ public class Drivebase {
         rightSparkController1.set(rightSpeed);
         rightSparkController2.set(rightSpeed);
 
-        SmartDashboard.putNumber("Left Spark 1", leftSparkController1.getAppliedOutput());
-        SmartDashboard.putNumber("Left Spark 2", leftSparkController2.getAppliedOutput());
-        SmartDashboard.putNumber("Right Spark 1", rightSparkController1.getAppliedOutput());
-        SmartDashboard.putNumber("Right Spark 2", rightSparkController2.getAppliedOutput());
+        SmartDashboard.putNumber("Left Spark 1",
+                leftSparkController1.getAppliedOutput());
+        SmartDashboard.putNumber("Left Spark 2",
+                leftSparkController2.getAppliedOutput());
+        SmartDashboard.putNumber("Right Spark 1",
+                rightSparkController1.getAppliedOutput());
+        SmartDashboard.putNumber("Right Spark 2",
+                rightSparkController2.getAppliedOutput());
     }
 
     public void setDriveSpeed(DriveSpeed driveSpeed) {

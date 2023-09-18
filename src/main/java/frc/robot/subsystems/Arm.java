@@ -24,7 +24,7 @@ public class Arm {
     public ArmState state = ArmState.RETRACTED;
 
     public enum ArmState {
-        RETRACTED(14, 6),
+        RETRACTED(0, 0),
         EXTENDED(-18, 2),
         GROUND_INTAKE(1, 2);
 
@@ -50,8 +50,8 @@ public class Arm {
     }
 
     public enum ControlSpeed {
-        FINE(0.5),
-        FULL(1.0);
+        FINE(0.1),
+        FULL(0.25);
 
         public final double speed;
 

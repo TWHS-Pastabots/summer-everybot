@@ -66,7 +66,7 @@ public class Robot extends TimedRobot {
         /* Drive Controls */
 
         // slow driving while holding square
-        if (driver.getSquareButton()) {
+        if (driver.getR1Button()) {
             drivebase.setDriveSpeed(DriveSpeed.SLOW);
         } else {
             drivebase.setDriveSpeed(DriveSpeed.FULL);
@@ -77,11 +77,10 @@ public class Robot extends TimedRobot {
         /* Intake Controls */
 
         // separate these into different variables for readability
-        boolean intakeCone = operator.getTriangleButton();
-        boolean intakeCube = operator.getSquareButton();
-        boolean outtake = operator.getCircleButton();
+        boolean intakeCone = operator.getCircleButton(); // a circle is a triangle
+        boolean intakeCube = operator.getTriangleButton(); // a triangle is a square
 
-        intake.update(intakeCone, intakeCube, outtake);
+        intake.update(intakeCone, intakeCube);
 
         /* Arm Controls */
 
@@ -106,7 +105,7 @@ public class Robot extends TimedRobot {
         } else if (operator.getL2Button()) {
             arm.setState(arm.state.prev());
         }
-        arm.update(operator.getLeftY(), operator.getRightY());
+        arm.update(operator.getRightY(), operator.getLeftY());
     }
 
     @Override
@@ -115,6 +114,7 @@ public class Robot extends TimedRobot {
 
     @Override
     public void disabledPeriodic() {
+
     }
 
     @Override

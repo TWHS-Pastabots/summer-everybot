@@ -6,6 +6,8 @@ import frc.robot.auton.commands.AutoDrive;
 public class Anshton extends SequentialCommandGroup {
     /** Creates a new Anshton. */
     public Anshton() {
-        addCommands(new AutoDrive(1));
+        addCommands(
+                new AutoDrive(0.75, 0, .2),
+                new AutoDrive(-0.75, 0, 2));
     }
 }

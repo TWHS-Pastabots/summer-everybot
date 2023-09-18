@@ -17,8 +17,8 @@ public class Intake {
         CUBE,
     }
 
-    private static final double INTAKE_OUTPUT_POWER = .75;
-    private static final double INTAKE_HOLD_POWER = 0.03;
+    private static final double INTAKE_OUTPUT_POWER = .5;
+    private static final double INTAKE_HOLD_POWER = 0.05;
 
     public static CANSparkMax intakeController;
 
@@ -53,17 +53,13 @@ public class Intake {
         this.state = state;
     }
 
-    private void updateState(boolean intakeCone, boolean intakeCube, boolean outtake) {
-        if (!intakeCone && !intakeCube && !outtake && lastGamePiece == GamePiece.NONE) {
+    private void updateState(boolean intakeCone, boolean intakeCube) {
+        if (!intakeCone && !intakeCube && lastGamePiece == GamePiece.NONE) {
             setState(IntakeState.OFF);
         } else if (intakeCone) {
             setState(IntakeState.INTAKE_CONE);
         } else if (intakeCube) {
             setState(IntakeState.INTAKE_CUBE);
-        } else if (outtake && lastGamePiece == GamePiece.CONE) {
-            setState(IntakeState.OUTAKE_CONE);
-        } else if (outtake && lastGamePiece == GamePiece.CUBE) {
-            setState(IntakeState.OUTAKE_CUBE);
         } else if (lastGamePiece == GamePiece.CONE) {
             setState(IntakeState.HOLD_CONE);
         } else if (lastGamePiece == GamePiece.CUBE) {
@@ -71,8 +67,8 @@ public class Intake {
         }
     }
 
-    public void update(boolean intakeCone, boolean intakeCube, boolean outtake) {
-        updateState(intakeCone, intakeCube, outtake);
+    public void update(boolean intakeCone, boolean intakeCube) {
+        updateState(intakeCone, intakeCube);
 
         intakeController.set(state.power);
         lastGamePiece = state.gamePiece;
