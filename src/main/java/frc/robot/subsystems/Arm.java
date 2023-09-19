@@ -19,8 +19,6 @@ public class Arm {
     private CANSparkMax armController;
     private CANSparkMax lowArmController;
 
-    private static final double MAX_VOLTS = 2;
-
     public ArmState state = ArmState.RETRACTED;
 
     public enum ArmState {

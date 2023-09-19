@@ -23,7 +23,7 @@ public class AutoArmRetract extends CommandBase {
         arm.setState(ArmState.RETRACTED);
         arm.update(0, 0);
 
-        if (arm.getArmPose() >= 14) {
+        if (arm.getArmPose() >= arm.state.poseU) {
             ended = true;
         }
     }
