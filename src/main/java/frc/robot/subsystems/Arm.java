@@ -14,7 +14,7 @@ public class Arm {
     private ControlSpeed controlSpeed = ControlSpeed.FULL;
 
     private PIDController armPID = new PIDController(1, 0, 0.0);
-    private PIDController lowerArmPID = new PIDController(1.1, 0.5, 0.0);
+    private PIDController lowerArmPID = new PIDController(0.05, 0.0, 0.0);
 
     private CANSparkMax armController;
     private CANSparkMax lowArmController;
@@ -25,9 +25,9 @@ public class Arm {
 
     public enum ArmState {
         RETRACTED(0, 0),
-        EXTENDED(-37, -7),
+        EXTENDED(-44, -15),
         GROUND_INTAKE_CONE(-16, 27),
-        GROUND_INTAKE_CUBE(-25, 70);
+        GROUND_INTAKE_CUBE(-16, 35);
 
         public final double poseU, poseL;
 
@@ -84,13 +84,14 @@ public class Arm {
             double reqPowerUpper = armPID.calculate(armController.getEncoder().getPosition(), state.poseU);
             double reqPowerLower = lowerArmPID.calculate(lowArmController.getEncoder().getPosition(), state.poseL);
 
-            reqPowerUpper = Misc.clamp(reqPowerUpper, -MAX_VOLTS, MAX_VOLTS);
-            reqPowerLower = Misc.clamp(reqPowerLower, -MAX_VOLTS, MAX_VOLTS);
+            reqPowerUpper = Misc.clamp(reqPowerUpper, -4, 4);
+            reqPowerLower = Misc.clamp(reqPowerLower, -6, 6);
+
+            SmartDashboard.putNumber("Upper Arm Volts", reqPowerUpper);
+            SmartDashboard.putNumber("Lower Arm Volts", reqPowerLower);
 
             armController.setVoltage(reqPowerUpper);
-            if (armController.getEncoder().getPosition() - 2 >= state.poseU) {
-                lowArmController.setVoltage(reqPowerLower);
-            }
+            lowArmController.setVoltage(reqPowerLower);
         }
     }
 
