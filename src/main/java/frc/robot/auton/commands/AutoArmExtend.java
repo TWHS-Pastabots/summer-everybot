@@ -23,7 +23,7 @@ public class AutoArmExtend extends CommandBase {
         arm.setState(ArmState.EXTENDED);
         arm.update(0, 0);
 
-        if (arm.getArmPose() >= arm.state.poseU) {
+        if (Math.abs(arm.getArmPose() - arm.state.poseU) <= 0.5) {
             ended = true;
         }
     }

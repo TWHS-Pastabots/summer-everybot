@@ -4,45 +4,30 @@ import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import com.revrobotics.CANSparkMax.IdleMode;
 import frc.robot.Ports;
+import frc.robot.subsystems.Arm.ArmState;
 
 public class Intake {
     private static Intake instance;
 
     private IntakeState state;
-    private static GamePiece lastGamePiece;
-
-    private enum GamePiece {
-        NONE,
-        CONE,
-        CUBE,
-    }
-
-    private static final double INTAKE_OUTPUT_POWER = .5;
-    private static final double INTAKE_HOLD_POWER = 0.05;
 
     public static CANSparkMax intakeController;
 
     public enum IntakeState {
-        INTAKE_CUBE(-INTAKE_OUTPUT_POWER, GamePiece.CUBE),
-        INTAKE_CONE(INTAKE_OUTPUT_POWER, GamePiece.CONE),
-        HOLD_CONE(INTAKE_HOLD_POWER, GamePiece.CONE),
-        HOLD_CUBE(-INTAKE_HOLD_POWER, GamePiece.CUBE),
-        OUTAKE_CONE(-INTAKE_OUTPUT_POWER, lastGamePiece),
-        OUTAKE_CUBE(INTAKE_OUTPUT_POWER, lastGamePiece),
-        OFF(0.0, GamePiece.NONE);
+        INTAKE(0.5),
+        OUTTAKE(-0.5),
+        SHOOT(-1),
+        OFF(0);
 
         public final double power;
-        public final GamePiece gamePiece;
 
-        private IntakeState(double power, GamePiece gamePiece) {
+        private IntakeState(double power) {
             this.power = power;
-            this.gamePiece = gamePiece;
+
         }
     }
 
     public Intake() {
-        lastGamePiece = GamePiece.NONE;
-
         intakeController = new CANSparkMax(Ports.INTAKE, MotorType.kBrushless);
         intakeController.setInverted(false);
         intakeController.setIdleMode(IdleMode.kBrake);
@@ -53,25 +38,23 @@ public class Intake {
         this.state = state;
     }
 
-    private void updateState(boolean intakeCone, boolean intakeCube) {
-        if (!intakeCone && !intakeCube && lastGamePiece == GamePiece.NONE) {
-            setState(IntakeState.OFF);
-        } else if (intakeCone) {
-            setState(IntakeState.INTAKE_CONE);
+    private void updateState(boolean outtake, boolean intakeCube) {
+        if (outtake) {
+            if (Arm.getInstance().state == ArmState.SHOOT) {
+                setState(IntakeState.SHOOT);
+            } else {
+                setState(IntakeState.OUTTAKE);
+            }
         } else if (intakeCube) {
-            setState(IntakeState.INTAKE_CUBE);
-        } else if (lastGamePiece == GamePiece.CONE) {
-            setState(IntakeState.HOLD_CONE);
-        } else if (lastGamePiece == GamePiece.CUBE) {
-            setState(IntakeState.HOLD_CUBE);
+            setState(IntakeState.INTAKE);
+        } else {
+            setState(IntakeState.OFF);
         }
     }
 
-    public void update(boolean intakeCone, boolean intakeCube) {
-        updateState(intakeCone, intakeCube);
-
+    public void update(boolean outtake, boolean intake) {
+        updateState(outtake, intake);
         intakeController.set(state.power);
-        lastGamePiece = state.gamePiece;
     }
 
     public static Intake getInstance() {

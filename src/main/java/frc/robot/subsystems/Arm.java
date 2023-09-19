@@ -10,11 +10,12 @@ import frc.robot.Ports;
 public class Arm {
     private static Arm instance;
 
-    private ArmControl controlState = ArmControl.PID;
+    public ArmControl controlState = ArmControl.PID;
     private ControlSpeed controlSpeed = ControlSpeed.FULL;
 
-    private PIDController armPID = new PIDController(1, 0, 0.0);
-    private PIDController lowerArmPID = new PIDController(0.05, 0.0, 0.0);
+    private PIDController armPID = new PIDController(1.3, 0, 0.0);
+    private PIDController lowerArmPID = new PIDController(.4, 0.0, 0.0);
+    // ^alternative p term = .05
 
     private CANSparkMax armController;
     private CANSparkMax lowArmController;
@@ -22,24 +23,21 @@ public class Arm {
     public ArmState state = ArmState.RETRACTED;
 
     public enum ArmState {
-        RETRACTED(0, 0),
-        EXTENDED(-44, -15),
-        GROUND_INTAKE_CONE(-16, 27),
-        GROUND_INTAKE_CUBE(-16, 35);
+        RETRACTED(0, -10, true, 5),
+        EXTENDED(-37, -30, false, 6),
+        GROUND_INTAKE(-16, 50, false, 4),
+        SHOOT(-37, -75, false, 5);
+        // - low values move the arm higher
+        // +
 
-        public final double poseU, poseL;
+        public final double poseU, poseL, volts;
+        public final boolean lowerFirst;
 
-        private ArmState(double poseU, double poseL) {
+        private ArmState(double poseU, double poseL, boolean lowerFirst, double volts) {
             this.poseU = poseU;
             this.poseL = poseL;
-        }
-
-        public final ArmState next() {
-            return values()[(ordinal() + 1) % values().length];
-        }
-
-        public final ArmState prev() {
-            return values()[(ordinal() - 1 + values().length) % values().length];
+            this.volts = volts;
+            this.lowerFirst = lowerFirst;
         }
     }
 
@@ -82,14 +80,23 @@ public class Arm {
             double reqPowerUpper = armPID.calculate(armController.getEncoder().getPosition(), state.poseU);
             double reqPowerLower = lowerArmPID.calculate(lowArmController.getEncoder().getPosition(), state.poseL);
 
-            reqPowerUpper = Misc.clamp(reqPowerUpper, -4, 4);
-            reqPowerLower = Misc.clamp(reqPowerLower, -6, 6);
+            reqPowerUpper = Misc.clamp(reqPowerUpper, -state.volts, state.volts);
+            reqPowerLower = Misc.clamp(reqPowerLower, -state.volts, state.volts);
 
             SmartDashboard.putNumber("Upper Arm Volts", reqPowerUpper);
             SmartDashboard.putNumber("Lower Arm Volts", reqPowerLower);
 
-            armController.setVoltage(reqPowerUpper);
-            lowArmController.setVoltage(reqPowerLower);
+            if (state.lowerFirst) {
+                if (Math.abs(lowArmController.getEncoder().getPosition() - state.poseL) <= 2) {
+                    armController.setVoltage(reqPowerUpper);
+                }
+                lowArmController.setVoltage(reqPowerLower);
+            } else {
+                if (Math.abs(getArmPose() - state.poseU) <= 2) {
+                    lowArmController.setVoltage(reqPowerLower);
+                }
+                armController.setVoltage(reqPowerUpper);
+            }
         }
     }
 

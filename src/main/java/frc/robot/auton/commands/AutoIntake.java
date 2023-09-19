@@ -4,14 +4,14 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.*;
 
-public class AutoIntakeCube extends CommandBase {
+public class AutoIntake extends CommandBase {
     private Intake intake;
     private double time;
     private double endTime;
 
     private boolean ended = false;
 
-    public AutoIntakeCube() {
+    public AutoIntake() {
         time = Timer.getFPGATimestamp();
         endTime = time + 1;
     }

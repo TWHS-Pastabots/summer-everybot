@@ -10,6 +10,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.subsystems.Drivebase;
 import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.Arm.ArmControl;
+import frc.robot.subsystems.Arm.ArmState;
 import frc.robot.subsystems.Arm.ControlSpeed;
 import frc.robot.subsystems.Drivebase.DriveSpeed;
 import frc.robot.subsystems.Arm;
@@ -25,8 +26,8 @@ import frc.robot.auton.sequences.*;
  * project.
  */
 public class Robot extends TimedRobot {
-    private PS4Controller driver;
-    private PS4Controller operator;
+    private PS4Controller driver; // blue
+    private PS4Controller operator; // red
 
     private Drivebase drivebase;
     private Intake intake;
@@ -78,10 +79,10 @@ public class Robot extends TimedRobot {
         /* Intake Controls */
 
         // separate these into different variables for readability
-        boolean intakeCone = operator.getCircleButton(); // a circle is a triangle
-        boolean intakeCube = operator.getTriangleButton(); // a triangle is a square
+        boolean outtake = operator.getCrossButton(); // getTriangle is a triangle
+        boolean intakeButton = operator.getCircleButton(); // a triangle is a square
 
-        intake.update(intakeCone, intakeCube);
+        intake.update(outtake, intakeButton);
 
         /* Arm Controls */
 
@@ -93,23 +94,34 @@ public class Robot extends TimedRobot {
         }
 
         // manage arm control states
-        if (operator.getShareButtonPressed()) {
-            arm.setControlState(ArmControl.MANUAL);
-        } else if (operator.getOptionsButtonPressed()) {
-            arm.setControlState(ArmControl.PID);
+        if (driver.getTriangleButtonPressed()) {
+            if (arm.controlState == ArmControl.MANUAL) {
+                arm.setControlState(ArmControl.PID);
+            } else {
+                arm.setControlState(ArmControl.MANUAL);
+            }
         }
 
         // manage arm PID states & update
         // the logic for whether or not the PID/manual mode actually runs is in Arm.java
-        if (operator.getR1ButtonPressed()) {
-            arm.setState(arm.state.next());
-        } else if (operator.getR2ButtonPressed()) {
-            arm.setState(arm.state.prev());
+        if (operator.getR1Button()) {
+            arm.setState(ArmState.EXTENDED);
+        } else if (operator.getL1Button()) {
+            arm.setState(ArmState.GROUND_INTAKE);
+        } else if (operator.getSquareButton()) {
+            arm.setState(ArmState.RETRACTED);
+        } else if (operator.getTriangleButton()) {
+            arm.setState(ArmState.SHOOT);
         }
+        // for operator
+        // getCircle interatcs with square button
+        // getSquare interacts with cross button
+        // getTriangle interatcs with triangle
+        // getCross interacts with circle button
+
         arm.update(operator.getRightY(), operator.getLeftY());
 
-        SmartDashboard.putBoolean("R2", operator.getR2Button());
-        SmartDashboard.putBoolean("L2", operator.getL2Button());
+        SmartDashboard.putBoolean("L1", operator.getL1Button());
     }
 
     @Override
