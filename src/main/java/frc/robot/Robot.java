@@ -6,6 +6,7 @@ package frc.robot;
 
 import edu.wpi.first.wpilibj.PS4Controller;
 import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.subsystems.Drivebase;
 import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.Arm.ArmControl;
@@ -100,12 +101,15 @@ public class Robot extends TimedRobot {
 
         // manage arm PID states & update
         // the logic for whether or not the PID/manual mode actually runs is in Arm.java
-        if (operator.getR2Button()) {
+        if (operator.getR1ButtonPressed()) {
             arm.setState(arm.state.next());
-        } else if (operator.getL2Button()) {
+        } else if (operator.getR2ButtonPressed()) {
             arm.setState(arm.state.prev());
         }
         arm.update(operator.getRightY(), operator.getLeftY());
+
+        SmartDashboard.putBoolean("R2", operator.getR2Button());
+        SmartDashboard.putBoolean("L2", operator.getL2Button());
     }
 
     @Override

@@ -10,11 +10,11 @@ import frc.robot.Ports;
 public class Arm {
     private static Arm instance;
 
-    private ArmControl controlState = ArmControl.MANUAL;
+    private ArmControl controlState = ArmControl.PID;
     private ControlSpeed controlSpeed = ControlSpeed.FULL;
 
-    private PIDController armPID = new PIDController(2.5, 1, 0.0);
-    private PIDController lowerArmPID = new PIDController(1.0, 0.0, 0.0);
+    private PIDController armPID = new PIDController(1, 0, 0.0);
+    private PIDController lowerArmPID = new PIDController(1.1, 0.5, 0.0);
 
     private CANSparkMax armController;
     private CANSparkMax lowArmController;
@@ -25,8 +25,9 @@ public class Arm {
 
     public enum ArmState {
         RETRACTED(0, 0),
-        EXTENDED(-18, 2),
-        GROUND_INTAKE(1, 2);
+        EXTENDED(-37, -7),
+        GROUND_INTAKE_CONE(-16, 27),
+        GROUND_INTAKE_CUBE(-25, 70);
 
         public final double poseU, poseL;
 
@@ -74,6 +75,7 @@ public class Arm {
     public void update(double lowerPower, double upperPower) {
         SmartDashboard.putNumber("ARM POSITION", armController.getEncoder().getPosition());
         SmartDashboard.putNumber("LOWER ARM POSITION", lowArmController.getEncoder().getPosition());
+        SmartDashboard.putString("Arm State", state.toString());
 
         if (controlState == ArmControl.MANUAL) {
             armController.set(upperPower * controlSpeed.speed);
@@ -86,7 +88,9 @@ public class Arm {
             reqPowerLower = Misc.clamp(reqPowerLower, -MAX_VOLTS, MAX_VOLTS);
 
             armController.setVoltage(reqPowerUpper);
-            lowArmController.setVoltage(reqPowerLower);
+            if (armController.getEncoder().getPosition() - 2 >= state.poseU) {
+                lowArmController.setVoltage(reqPowerLower);
+            }
         }
     }
 
