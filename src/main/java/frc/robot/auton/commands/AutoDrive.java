@@ -14,7 +14,6 @@ public class AutoDrive extends CommandBase {
 
     private boolean ended = false;
 
-    /** Creates a new AutoDrive. */
     public AutoDrive(double forward, double turn, double time) {
         endTime = time;
         this.turn = turn;

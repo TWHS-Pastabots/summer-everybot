@@ -6,12 +6,9 @@ package frc.robot;
 
 import edu.wpi.first.wpilibj.PS4Controller;
 import edu.wpi.first.wpilibj.TimedRobot;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.subsystems.Drivebase;
 import frc.robot.subsystems.Intake;
-import frc.robot.subsystems.Arm.ArmControl;
-import frc.robot.subsystems.Arm.ArmState;
-import frc.robot.subsystems.Arm.ControlSpeed;
+import frc.robot.subsystems.Arm.*;
 import frc.robot.subsystems.Drivebase.DriveSpeed;
 import frc.robot.subsystems.Arm;
 import frc.robot.auton.sequences.*;
@@ -74,13 +71,13 @@ public class Robot extends TimedRobot {
             drivebase.setDriveSpeed(DriveSpeed.FULL);
         }
 
-        drivebase.drive(driver.getRightY(), driver.getLeftX());
+        drivebase.drive(driver.getRawAxis(Controller.PS_AXIS_RIGHT_Y), driver.getRawAxis(Controller.PS_AXIS_LEFT_X));
 
         /* Intake Controls */
 
         // separate these into different variables for readability
-        boolean outtake = operator.getCrossButton(); // getTriangle is a triangle
-        boolean intakeButton = operator.getCircleButton(); // a triangle is a square
+        boolean outtake = operator.getRawButton(Controller.PS_CIRCLE);
+        boolean intakeButton = operator.getRawButton(Controller.PS_SQUARE);
 
         intake.update(outtake, intakeButton);
 
@@ -88,40 +85,34 @@ public class Robot extends TimedRobot {
 
         // finer control when holding L1
         if (operator.getL1Button()) {
-            arm.setControlSpeed(ControlSpeed.FINE);
+            arm.setControlSpeed(ArmControlSpeed.FINE);
         } else {
-            arm.setControlSpeed(ControlSpeed.FULL);
+            arm.setControlSpeed(ArmControlSpeed.FULL);
         }
 
         // manage arm control states
         if (driver.getTriangleButtonPressed()) {
-            if (arm.controlState == ArmControl.MANUAL) {
-                arm.setControlState(ArmControl.PID);
+            if (arm.controlState == ArmControlState.MANUAL) {
+                arm.setControlState(ArmControlState.PID);
             } else {
-                arm.setControlState(ArmControl.MANUAL);
+                arm.setControlState(ArmControlState.MANUAL);
             }
         }
 
         // manage arm PID states & update
         // the logic for whether or not the PID/manual mode actually runs is in Arm.java
-        if (operator.getR1Button()) {
+
+        if (operator.getRawButton(Controller.PS_R1)) {
             arm.setState(ArmState.EXTENDED);
-        } else if (operator.getL1Button()) {
+        } else if (operator.getRawButton(Controller.PS_L1)) {
             arm.setState(ArmState.GROUND_INTAKE);
-        } else if (operator.getSquareButton()) {
+        } else if (operator.getRawButton(Controller.PS_CROSS)) {
             arm.setState(ArmState.RETRACTED);
-        } else if (operator.getTriangleButton()) {
+        } else if (operator.getRawButton(Controller.PS_TRIANGLE)) {
             arm.setState(ArmState.SHOOT);
         }
-        // for operator
-        // getCircle interatcs with square button
-        // getSquare interacts with cross button
-        // getTriangle interatcs with triangle
-        // getCross interacts with circle button
 
-        arm.update(operator.getRightY(), operator.getLeftY());
-
-        SmartDashboard.putBoolean("L1", operator.getL1Button());
+        arm.update(operator.getRawAxis(Controller.PS_AXIS_RIGHT_Y), operator.getRawAxis(Controller.PS_AXIS_LEFT_Y));
     }
 
     @Override

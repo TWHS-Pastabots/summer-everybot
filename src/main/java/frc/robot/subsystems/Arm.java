@@ -10,8 +10,8 @@ import frc.robot.Ports;
 public class Arm {
     private static Arm instance;
 
-    public ArmControl controlState = ArmControl.PID;
-    private ControlSpeed controlSpeed = ControlSpeed.FULL;
+    public ArmControlState controlState = ArmControlState.PID;
+    private ArmControlSpeed controlSpeed = ArmControlSpeed.FULL;
 
     private PIDController armPID = new PIDController(1.3, 0, 0.0);
     private PIDController lowerArmPID = new PIDController(.4, 0.0, 0.0);
@@ -28,7 +28,7 @@ public class Arm {
         GROUND_INTAKE(-16, 50, false, 4),
         SHOOT(-37, -75, false, 5);
         // - low values move the arm higher
-        // +
+        // + high values move the arm lower
 
         public final double poseU, poseL, volts;
         public final boolean lowerFirst;
@@ -41,18 +41,18 @@ public class Arm {
         }
     }
 
-    public enum ArmControl {
+    public enum ArmControlState {
         MANUAL,
         PID,
     }
 
-    public enum ControlSpeed {
+    public enum ArmControlSpeed {
         FINE(0.1),
         FULL(0.25);
 
         public final double speed;
 
-        private ControlSpeed(double speed) {
+        private ArmControlSpeed(double speed) {
             this.speed = speed;
         }
     }
@@ -73,10 +73,10 @@ public class Arm {
         SmartDashboard.putNumber("LOWER ARM POSITION", lowArmController.getEncoder().getPosition());
         SmartDashboard.putString("Arm State", state.toString());
 
-        if (controlState == ArmControl.MANUAL) {
+        if (controlState == ArmControlState.MANUAL) {
             armController.set(upperPower * controlSpeed.speed);
             lowArmController.set(lowerPower * controlSpeed.speed);
-        } else if (controlState == ArmControl.PID) {
+        } else if (controlState == ArmControlState.PID) {
             double reqPowerUpper = armPID.calculate(armController.getEncoder().getPosition(), state.poseU);
             double reqPowerLower = lowerArmPID.calculate(lowArmController.getEncoder().getPosition(), state.poseL);
 
@@ -87,12 +87,12 @@ public class Arm {
             SmartDashboard.putNumber("Lower Arm Volts", reqPowerLower);
 
             if (state.lowerFirst) {
-                if (Math.abs(lowArmController.getEncoder().getPosition() - state.poseL) <= 2) {
+                if (Math.abs(getLowerPose() - state.poseL) <= 2) {
                     armController.setVoltage(reqPowerUpper);
                 }
                 lowArmController.setVoltage(reqPowerLower);
             } else {
-                if (Math.abs(getArmPose() - state.poseU) <= 2) {
+                if (Math.abs(getUpperPose() - state.poseU) <= 2) {
                     lowArmController.setVoltage(reqPowerLower);
                 }
                 armController.setVoltage(reqPowerUpper);
@@ -104,16 +104,20 @@ public class Arm {
         this.state = state;
     }
 
-    public void setControlState(ArmControl controlState) {
+    public void setControlState(ArmControlState controlState) {
         this.controlState = controlState;
     }
 
-    public void setControlSpeed(ControlSpeed controlSpeed) {
+    public void setControlSpeed(ArmControlSpeed controlSpeed) {
         this.controlSpeed = controlSpeed;
     }
 
-    public double getArmPose() {
+    public double getUpperPose() {
         return armController.getEncoder().getPosition();
+    }
+
+    public double getLowerPose() {
+        return lowArmController.getEncoder().getPosition();
     }
 
     public static Arm getInstance() {

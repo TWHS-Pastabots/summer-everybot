@@ -11,9 +11,9 @@ public class AutoIntake extends CommandBase {
 
     private boolean ended = false;
 
-    public AutoIntake() {
+    public AutoIntake(double duration) {
         time = Timer.getFPGATimestamp();
-        endTime = time + 1;
+        endTime = time + duration;
     }
 
     @Override
@@ -25,7 +25,7 @@ public class AutoIntake extends CommandBase {
     public void execute() {
         intake.update(false, true);
 
-        if (time == endTime) {
+        if (time >= endTime) {
             ended = true;
         }
     }

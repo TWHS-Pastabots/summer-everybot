@@ -25,7 +25,7 @@ public class Outtake extends CommandBase {
     public void execute() {
         intake.update(true, false);
 
-        if (time == endTime) {
+        if (time >= endTime) {
             ended = true;
         }
     }

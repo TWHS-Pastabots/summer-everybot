@@ -2,8 +2,7 @@ package frc.robot.auton.commands;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.*;
-import frc.robot.subsystems.Arm.ArmControl;
-import frc.robot.subsystems.Arm.ArmState;
+import frc.robot.subsystems.Arm.*;
 
 public class AutoArmExtend extends CommandBase {
     private Arm arm;
@@ -19,11 +18,12 @@ public class AutoArmExtend extends CommandBase {
 
     @Override
     public void execute() {
-        arm.setControlState(ArmControl.PID);
+        arm.setControlState(ArmControlState.PID);
         arm.setState(ArmState.EXTENDED);
         arm.update(0, 0);
 
-        if (Math.abs(arm.getArmPose() - arm.state.poseU) <= 0.5) {
+        if (Math.abs(arm.getUpperPose() - arm.state.poseU) <= 0.5
+                && Math.abs(arm.getUpperPose() - arm.state.poseU) >= 0) {
             ended = true;
         }
     }

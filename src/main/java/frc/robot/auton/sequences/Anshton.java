@@ -12,21 +12,17 @@ public class Anshton extends SequentialCommandGroup {
                 // score 1st piece
                 new Outtake(),
                 // drive backwards out of community
-                new AutoDrive(-0.75, 0, 2),
+                new AutoDrive(-0.75, 0, 1),
                 // turn robot
-                new AutoDrive(0, 1, 0.75),
-                // drive to 2nd piece
-                new AutoDrive(0.75, 0, 4),
-                // position arm for 2nd piece
-                new AutoArmGroundIntake(),
-                // intake 2nd piece
-                new AutoIntake(),
+                new AutoDrive(0, 1, 0),
+                // drive to and intake second piece
+                new IntakeWhileDriving(),
                 // drive backwards to community
-                new AutoDrive(-0.75, 0, 4),
+                new AutoDrive(-0.75, 0, 0),
                 // turn robot
-                new AutoDrive(0, 1, 0.75),
+                new AutoDrive(0, 1, 0),
                 // drive to goal
-                new AutoDrive(0.75, 0, 2),
+                new AutoDrive(0.75, 0, 0),
                 // position arm to score on ground node
                 new AutoArmGroundIntake(),
                 // score 2nd piece
