@@ -23,7 +23,9 @@ public class AutoArmGroundIntake extends CommandBase {
         arm.update(0, 0);
 
         if (Math.abs(arm.getUpperPose() - arm.state.poseU) <= 0.5
-                && Math.abs(arm.getUpperPose() - arm.state.poseU) >= 0) {
+                && Math.abs(arm.getUpperPose() - arm.state.poseU) >= 0
+                && Math.abs(arm.getLowerPose() - arm.state.poseL) <= 0.5
+                && Math.abs(arm.getLowerPose() - arm.state.poseL) >= 0) {
             ended = true;
         }
     }

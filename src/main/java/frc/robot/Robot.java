@@ -6,12 +6,15 @@ package frc.robot;
 
 import edu.wpi.first.wpilibj.PS4Controller;
 import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.subsystems.Drivebase;
 import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.Arm.*;
 import frc.robot.subsystems.Drivebase.DriveSpeed;
 import frc.robot.subsystems.Arm;
 import frc.robot.auton.sequences.*;
+
+// import java.util.LinkedList;
 
 /**
  * The VM is configured to automatically run this class, and to call the
@@ -30,7 +33,10 @@ public class Robot extends TimedRobot {
     private Intake intake;
     private Arm arm;
 
-    private Anshton anshton;
+    // private LinkedList<Double> UpperPoseExtended = new LinkedList<>();
+
+    // private Anshton anshton;
+    private Test test;
 
     @Override
     public void robotInit() {
@@ -41,17 +47,23 @@ public class Robot extends TimedRobot {
 
     @Override
     public void robotPeriodic() {
+        // if (operator.getRawButton(Controller.PS_R1)) {
+        // UpperPoseExtended.add(arm.getUpperPose());
+        // }
     }
 
     @Override
     public void autonomousInit() {
-        anshton = new Anshton();
-        anshton.initialize();
+        test = new Test();
+        test.initialize();
+        // anshton = new Anshton();
+        // anshton.initialize();
     }
 
     @Override
     public void autonomousPeriodic() {
-        anshton.execute();
+        test.execute();
+        // anshton.execute();
     }
 
     @Override

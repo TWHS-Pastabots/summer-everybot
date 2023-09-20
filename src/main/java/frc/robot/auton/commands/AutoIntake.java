@@ -25,6 +25,7 @@ public class AutoIntake extends CommandBase {
     public void execute() {
         intake.update(false, true);
 
+        time = Timer.getFPGATimestamp();
         if (time >= endTime) {
             ended = true;
         }

@@ -11,6 +11,7 @@ public class Arm {
     private static Arm instance;
 
     public ArmControlState controlState = ArmControlState.PID;
+
     private ArmControlSpeed controlSpeed = ArmControlSpeed.FULL;
 
     private PIDController armPID = new PIDController(1.3, 0, 0.0);
@@ -24,9 +25,9 @@ public class Arm {
 
     public enum ArmState {
         RETRACTED(0, -10, true, 5),
-        EXTENDED(-37, -30, false, 6),
-        GROUND_INTAKE(-16, 50, false, 4),
-        SHOOT(-37, -75, false, 5);
+        EXTENDED(-37, -30, true, 6),
+        GROUND_INTAKE(-16, 50, true, 4),
+        SHOOT(-37, -75, true, 5);
         // - low values move the arm higher
         // + high values move the arm lower
 
@@ -98,9 +99,11 @@ public class Arm {
                 armController.setVoltage(reqPowerUpper);
             }
         }
+
     }
 
     public void setState(ArmState state) {
+
         this.state = state;
     }
 

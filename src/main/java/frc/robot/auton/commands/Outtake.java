@@ -13,7 +13,7 @@ public class Outtake extends CommandBase {
 
     public Outtake() {
         time = Timer.getFPGATimestamp();
-        endTime = time + 1;
+        endTime = time + 1.5;
     }
 
     @Override
@@ -24,6 +24,7 @@ public class Outtake extends CommandBase {
     @Override
     public void execute() {
         intake.update(true, false);
+        time = Timer.getFPGATimestamp();
 
         if (time >= endTime) {
             ended = true;
