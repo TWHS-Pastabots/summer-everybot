@@ -2,6 +2,7 @@ package frc.robot.auton.commands;
 
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.CommandBase;
+
 import frc.robot.subsystems.Drivebase;
 
 public class AutoDrive extends CommandBase {
@@ -18,11 +19,6 @@ public class AutoDrive extends CommandBase {
         endTime = time;
         this.turn = turn;
         this.forward = -forward;
-    }
-
-    public AutoDrive(double time) {
-        endTime = time;
-        turn = 0;
     }
 
     @Override

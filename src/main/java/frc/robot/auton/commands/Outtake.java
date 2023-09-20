@@ -12,13 +12,14 @@ public class Outtake extends CommandBase {
     private boolean ended = false;
 
     public Outtake() {
-        time = Timer.getFPGATimestamp();
-        endTime = time + 1.5;
+        endTime = 1.5;
     }
 
     @Override
     public void initialize() {
         intake = Intake.getInstance();
+        time = Timer.getFPGATimestamp();
+        endTime += time;
     }
 
     @Override

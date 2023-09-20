@@ -2,8 +2,10 @@ package frc.robot.subsystems;
 
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
+
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+
 import frc.robot.Misc;
 import frc.robot.Ports;
 
@@ -16,7 +18,6 @@ public class Arm {
 
     private PIDController armPID = new PIDController(1.3, 0, 0.0);
     private PIDController lowerArmPID = new PIDController(.4, 0.0, 0.0);
-    // ^alternative p term = .05
 
     private CANSparkMax armController;
     private CANSparkMax lowArmController;
@@ -60,11 +61,10 @@ public class Arm {
 
     public Arm() {
         armController = new CANSparkMax(Ports.ARM, MotorType.kBrushless);
-        lowArmController = new CANSparkMax(Ports.LOWER_ARM, MotorType.kBrushless);
-
         armController.setInverted(false);
         armController.burnFlash();
 
+        lowArmController = new CANSparkMax(Ports.LOWER_ARM, MotorType.kBrushless);
         lowArmController.setInverted(true);
         lowArmController.burnFlash();
     }
@@ -87,13 +87,14 @@ public class Arm {
             SmartDashboard.putNumber("Upper Arm Volts", reqPowerUpper);
             SmartDashboard.putNumber("Lower Arm Volts", reqPowerLower);
 
+            // pid order
             if (state.lowerFirst) {
-                if (Math.abs(getLowerPose() - state.poseL) <= 2) {
+                if (hasLowerReachedTargetPose(2)) {
                     armController.setVoltage(reqPowerUpper);
                 }
                 lowArmController.setVoltage(reqPowerLower);
             } else {
-                if (Math.abs(getUpperPose() - state.poseU) <= 2) {
+                if (hasUpperReachedTargetPose(2)) {
                     lowArmController.setVoltage(reqPowerLower);
                 }
                 armController.setVoltage(reqPowerUpper);
@@ -103,7 +104,6 @@ public class Arm {
     }
 
     public void setState(ArmState state) {
-
         this.state = state;
     }
 
@@ -115,12 +115,16 @@ public class Arm {
         this.controlSpeed = controlSpeed;
     }
 
-    public double getUpperPose() {
-        return armController.getEncoder().getPosition();
+    public boolean hasLowerReachedTargetPose(double tolerance) {
+        return Math.abs(lowArmController.getEncoder().getPosition() - state.poseL) <= tolerance;
     }
 
-    public double getLowerPose() {
-        return lowArmController.getEncoder().getPosition();
+    public boolean hasUpperReachedTargetPose(double tolerance) {
+        return Math.abs(armController.getEncoder().getPosition() - state.poseL) <= tolerance;
+    }
+
+    public boolean hasReachedTargetPose(double tolerance) {
+        return hasLowerReachedTargetPose(tolerance) && hasUpperReachedTargetPose(tolerance);
     }
 
     public static Arm getInstance() {

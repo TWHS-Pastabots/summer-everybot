@@ -2,6 +2,7 @@ package frc.robot.auton.commands;
 
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.CommandBase;
+
 import frc.robot.subsystems.*;
 
 public class AutoIntake extends CommandBase {
@@ -12,13 +13,14 @@ public class AutoIntake extends CommandBase {
     private boolean ended = false;
 
     public AutoIntake(double duration) {
-        time = Timer.getFPGATimestamp();
-        endTime = time + duration;
+        endTime = duration;
     }
 
     @Override
     public void initialize() {
         intake = Intake.getInstance();
+        time = Timer.getFPGATimestamp();
+        endTime += time;
     }
 
     @Override
