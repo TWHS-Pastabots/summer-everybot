@@ -4,15 +4,15 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.*;
 
-public class Outtake extends CommandBase {
+public class AutoOuttake extends CommandBase {
     private Intake intake;
     private double time;
     private double endTime;
 
     private boolean ended = false;
 
-    public Outtake() {
-        endTime = 1.5;
+    public AutoOuttake(double duration) {
+        endTime = duration;
     }
 
     @Override

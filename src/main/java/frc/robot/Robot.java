@@ -74,7 +74,7 @@ public class Robot extends TimedRobot {
         /* Drive Controls */
 
         // slow driving while holding square
-        if (driver.getR1Button()) {
+        if (driver.getRawButton(Controller.PS_R1)) {
             drivebase.setDriveSpeed(DriveSpeed.SLOW);
         } else {
             drivebase.setDriveSpeed(DriveSpeed.FULL);

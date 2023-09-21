@@ -10,7 +10,7 @@ public class Anshton extends SequentialCommandGroup {
                 // position for scoring 1st piece
                 new ScorePreLoaded(),
                 // score 1st piece
-                new Outtake(),
+                new AutoOuttake(0),
                 // drive backwards out of community
                 new AutoDrive(-0.75, 0, 1),
                 // turn robot
@@ -26,6 +26,6 @@ public class Anshton extends SequentialCommandGroup {
                 // position arm to score on ground node
                 new AutoArmGroundIntake(),
                 // score 2nd piece
-                new Outtake());
+                new AutoOuttake(0));
     }
 }

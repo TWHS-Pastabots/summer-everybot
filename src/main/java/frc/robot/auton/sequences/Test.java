@@ -9,9 +9,12 @@ public class Test extends SequentialCommandGroup {
 
         addCommands(
                 new AutoDrive(-0.75, 0, 0.4),
-                new AutoArmShoot(),
-                new Outtake(),
+                new AutoArmShoot(),//Shooting position
+                new AutoOuttake(2), //Has scored the piece
                 new AutoArmRetract(),
-                new AutoDrive(-0.75, .015, 2.9));
+                new AutoDrive(-0.75, .015, 2.9));//Gone to pickup
+                new AutoIntake(1.5);//Picks it up
+                
+                
     }
 }
