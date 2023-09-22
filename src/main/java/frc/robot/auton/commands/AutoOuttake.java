@@ -29,12 +29,12 @@ public class AutoOuttake extends CommandBase {
 
         if (time >= endTime) {
             ended = true;
+            intake.update(false, false);
         }
     }
 
     @Override
     public void end(boolean interrupted) {
-        intake.update(false, false);
     }
 
     @Override

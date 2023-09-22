@@ -6,7 +6,6 @@ package frc.robot;
 
 import edu.wpi.first.wpilibj.PS4Controller;
 import edu.wpi.first.wpilibj.TimedRobot;
-
 import frc.robot.subsystems.Drivebase;
 import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.Arm.*;
@@ -57,9 +56,9 @@ public class Robot extends TimedRobot {
 
     @Override
     public void autonomousPeriodic() {
-        arm.update(0, 0);
-
         test.execute();
+
+        arm.update(0, 0);
         // anshton.execute();
     }
 
@@ -74,13 +73,14 @@ public class Robot extends TimedRobot {
         /* Drive Controls */
 
         // slow driving while holding square
-        if (driver.getRawButton(Controller.PS_R1)) {
+        if (driver.getRawButton(Controller.PS_L1)) {
             drivebase.setDriveSpeed(DriveSpeed.SLOW);
         } else {
             drivebase.setDriveSpeed(DriveSpeed.FULL);
         }
 
-        drivebase.drive(driver.getRawAxis(Controller.PS_AXIS_RIGHT_Y), driver.getRawAxis(Controller.PS_AXIS_LEFT_X));
+        drivebase.drive(driver.getRawAxis(Controller.PS_AXIS_RIGHT_Y) * .75,
+                driver.getRawAxis(Controller.PS_AXIS_LEFT_X) * .75);
 
         /* Intake Controls */
 
@@ -118,7 +118,7 @@ public class Robot extends TimedRobot {
         } else if (operator.getRawButton(Controller.PS_CROSS)) {
             arm.setState(ArmState.RETRACTED);
         } else if (operator.getRawButton(Controller.PS_TRIANGLE)) {
-            arm.setState(ArmState.SHOOT);
+            arm.setState(ArmState.LOW);
         }
 
         arm.update(operator.getRawAxis(Controller.PS_AXIS_RIGHT_Y), operator.getRawAxis(Controller.PS_AXIS_LEFT_Y));

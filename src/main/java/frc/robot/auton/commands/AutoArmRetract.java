@@ -21,7 +21,7 @@ public class AutoArmRetract extends CommandBase {
     public void execute() {
         arm.setState(ArmState.RETRACTED);
 
-        if (arm.hasReachedTargetPose(0.5)) {
+        if (arm.hasReachedTargetPose(0.8)) {
             ended = true;
         }
     }

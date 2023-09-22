@@ -2,6 +2,7 @@ package frc.robot.subsystems;
 
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
+
 import com.revrobotics.CANSparkMax.IdleMode;
 
 import frc.robot.Ports;
@@ -54,6 +55,7 @@ public class Intake {
 
     public void update(boolean outtake, boolean intake) {
         updateState(outtake, intake);
+
         intakeController.set(state.power);
     }
 

@@ -1,16 +1,16 @@
 package frc.robot.auton.sequences;
 
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
-import frc.robot.auton.commands.*;
+import frc.robot.auton.commands.AutoArmGroundIntake;
+import frc.robot.auton.commands.AutoDrive;
+import frc.robot.auton.commands.AutoIntake;
 
 public class IntakeWhileDriving extends ParallelCommandGroup {
-
-    public IntakeWhileDriving() {
-        addCommands(
-                new AutoArmExtend(),
-                new AutoDrive(0.75, 0, 0),
-                new AutoIntake(5));
-        // Intake runs while driving
-        // W code
-    }
+  /** Creates a new IntakeWhileDriving. */
+  public IntakeWhileDriving() {
+    addCommands(
+        new AutoArmGroundIntake(),
+        new AutoIntake(3),
+        new AutoDrive(0.75, 0, 1.0));
+  }
 }

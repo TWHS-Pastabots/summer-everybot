@@ -1,5 +1,6 @@
 package frc.robot.auton.commands;
 
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 
 import frc.robot.subsystems.*;
@@ -24,6 +25,7 @@ public class AutoArmShoot extends CommandBase {
         if (arm.hasReachedTargetPose(0.5)) {
             ended = true;
         }
+
     }
 
     @Override

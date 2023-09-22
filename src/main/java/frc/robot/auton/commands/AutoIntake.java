@@ -30,12 +30,12 @@ public class AutoIntake extends CommandBase {
         time = Timer.getFPGATimestamp();
         if (time >= endTime) {
             ended = true;
+            intake.update(false, false);
         }
     }
 
     @Override
     public void end(boolean interrupted) {
-        intake.update(false, false);
     }
 
     @Override
