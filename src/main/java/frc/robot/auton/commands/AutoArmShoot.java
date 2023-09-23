@@ -1,6 +1,5 @@
 package frc.robot.auton.commands;
 
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 
 import frc.robot.subsystems.*;
@@ -22,7 +21,7 @@ public class AutoArmShoot extends CommandBase {
     public void execute() {
         arm.setState(ArmState.SHOOT);
 
-        if (arm.hasReachedTargetPose(0.5)) {
+        if (arm.hasReachedTargetPose(1.0)) {
             ended = true;
         }
 

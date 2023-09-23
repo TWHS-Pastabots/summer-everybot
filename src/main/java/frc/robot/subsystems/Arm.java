@@ -16,7 +16,7 @@ public class Arm {
 
     private ArmControlSpeed controlSpeed = ArmControlSpeed.FULL;
 
-    private PIDController armPID = new PIDController(1.2, 0.05, 0.0);
+    private PIDController armPID = new PIDController(0.8, 0.0, 0.0);
     private PIDController lowerArmPID = new PIDController(.4, 0.0, 0.0);
 
     private CANSparkMax armController;
@@ -25,12 +25,14 @@ public class Arm {
     public ArmState state = ArmState.RETRACTED;
 
     public enum ArmState {
-        RETRACTED(5, -20, true, 5),
-        EXTENDED(-37, -30, true, 6),
-        GROUND_INTAKE(-13, 60, false, 4),
-        LOW(-13, 0, false, 4),
-        SHOOT(-37, -40, true, 5);
+        RETRACTED(5, -30, true, 4),
+        EXTENDED(-37, -25, true, 4),
+        GROUND_INTAKE(-13, 50, false, 3),
+        MID(-25, -25, true, 4),
+        LOW(-13, 0, false, 3),
+        SHOOT(-37, -40, true, 4);
         // - low values move the arm higher
+
         // + high values move the arm lower
 
         public final double poseU, poseL, volts;

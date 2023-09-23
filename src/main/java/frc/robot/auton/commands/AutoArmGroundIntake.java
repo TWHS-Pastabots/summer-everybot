@@ -21,7 +21,7 @@ public class AutoArmGroundIntake extends CommandBase {
     public void execute() {
         arm.setState(ArmState.GROUND_INTAKE);
 
-        if (arm.hasReachedTargetPose(0.5)) {
+        if (arm.hasReachedTargetPose(1.0)) {
             ended = true;
         }
     }

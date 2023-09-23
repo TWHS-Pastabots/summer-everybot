@@ -8,14 +8,9 @@ public class Test extends SequentialCommandGroup {
   public Test() {
 
     addCommands(
-        new AutoDrive(-0.75, 0.015, 0.4),
-        new AutoArmShoot(), // Shooting position
-        new AutoOuttake(0.25), // Has scored the piece
-        new AutoArmRetract(),
-        new AutoDrive(-0.75, .024, 2.4), // Gone to pickup
-        new AutoDrive(0, 0, 0.5),
-        new AutoDrive(0, 1, 1.11643297543),
-        new IntakeWhileDriving()); // Picks it up
+        new AutoDrive(-1, 0.023, 2),
+        new AutoDrive(0, 0, 1),
+        new AutoDrive(0, .5, 5)); // Gone to pickup
 
   }
 }

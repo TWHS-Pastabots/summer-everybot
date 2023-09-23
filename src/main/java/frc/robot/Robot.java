@@ -31,12 +31,14 @@ public class Robot extends TimedRobot {
     private Arm arm;
 
     private boolean outtake;
+    private boolean cycle;
 
     private Anshton anshton;
-    private Test test;
+    private ChargingStation chargingStation;
 
     @Override
     public void robotInit() {
+
         drivebase = Drivebase.getInstance();
         intake = Intake.getInstance();
         arm = Arm.getInstance();
@@ -50,18 +52,19 @@ public class Robot extends TimedRobot {
     public void autonomousInit() {
         arm.setControlState(ArmControlState.PID);
 
-        test = new Test();
-        test.initialize();
         anshton = new Anshton();
-        anshton.initialize();
+        chargingStation = new ChargingStation();
+        chargingStation.initialize();
+        // anshton.initialize();
+        chargingStation.execute();
+        // anshton.execute();
     }
 
     @Override
     public void autonomousPeriodic() {
-        test.execute();
 
         arm.update(0, 0);
-        // anshton.execute();
+
     }
 
     @Override
@@ -74,23 +77,23 @@ public class Robot extends TimedRobot {
     public void teleopPeriodic() {
         /* Drive Controls */
 
-        // slow driving while holding square
+        // slow driving while holding left bumper, fast while holding right bumper
         if (driver.getRawButton(Controller.PS_L1)) {
             drivebase.setDriveSpeed(DriveSpeed.SLOW);
         } else {
-            drivebase.setDriveSpeed(DriveSpeed.FULL);
+            drivebase.setDriveSpeed(DriveSpeed.FAST);
         }
 
-        drivebase.drive(driver.getRawAxis(Controller.PS_AXIS_RIGHT_Y) * .75,
-                driver.getRawAxis(Controller.PS_AXIS_LEFT_X) * .75);
+        drivebase.drive(driver.getRawAxis(Controller.PS_AXIS_RIGHT_Y),
+                driver.getRawAxis(Controller.PS_AXIS_LEFT_X) * 0.75);
 
         /* Intake Controls */
 
         // separate these into different variables for readability
-        if (arm.state != ArmState.RETRACTED){
+        if (arm.state != ArmState.RETRACTED) {
             outtake = operator.getRawButton(Controller.PS_CIRCLE);
         } else {
-           outtake = false;
+            outtake = false;
         }
         boolean intakeButton = operator.getRawButton(Controller.PS_SQUARE);
 
@@ -123,8 +126,14 @@ public class Robot extends TimedRobot {
             arm.setState(ArmState.GROUND_INTAKE);
         } else if (operator.getRawButton(Controller.PS_CROSS)) {
             arm.setState(ArmState.RETRACTED);
-        } else if (operator.getRawButton(Controller.PS_TRIANGLE)) {
-            arm.setState(ArmState.LOW);
+        } else if (operator.getRawButtonPressed(Controller.PS_TRIANGLE)) {
+            if (cycle) {
+                arm.setState(ArmState.MID);
+                cycle = false;
+            } else {
+                arm.setState(ArmState.LOW);
+                cycle = true;
+            }
         }
 
         arm.update(operator.getRawAxis(Controller.PS_AXIS_RIGHT_Y), operator.getRawAxis(Controller.PS_AXIS_LEFT_Y));

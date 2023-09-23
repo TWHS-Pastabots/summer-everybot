@@ -8,7 +8,7 @@ import frc.robot.Ports;
 
 public class Drivebase {
 
-    private DriveSpeed driveSpeed = DriveSpeed.FULL;
+    private DriveSpeed driveSpeed = DriveSpeed.FAST;
 
     private static CANSparkMax rightSparkController1;
     private static CANSparkMax rightSparkController2;
@@ -19,7 +19,7 @@ public class Drivebase {
 
     public enum DriveSpeed {
         SLOW(0.25),
-        FULL(0.5);
+        FAST(0.5);
 
         public final double speed;
 
@@ -32,19 +32,27 @@ public class Drivebase {
         /* Right motor group */
         rightSparkController1 = new CANSparkMax(Ports.DRIVE_RIGHT_1, MotorType.kBrushed);
         rightSparkController1.setInverted(true);
+        rightSparkController1.setOpenLoopRampRate(0.5);
+        rightSparkController1.setClosedLoopRampRate(0.5);
         rightSparkController1.burnFlash();
 
         rightSparkController2 = new CANSparkMax(Ports.DRIVE_RIGHT_2, MotorType.kBrushed);
         rightSparkController2.setInverted(true);
+        rightSparkController2.setOpenLoopRampRate(0.5);
+        rightSparkController2.setClosedLoopRampRate(0.5);
         rightSparkController2.burnFlash();
 
         /* Left motor group */
         leftSparkController1 = new CANSparkMax(Ports.DRIVE_LEFT_1, MotorType.kBrushed);
         leftSparkController1.setInverted(false);
+        leftSparkController1.setOpenLoopRampRate(0.5);
+        leftSparkController1.setClosedLoopRampRate(0.5);
         leftSparkController1.burnFlash();
 
         leftSparkController2 = new CANSparkMax(Ports.DRIVE_LEFT_2, MotorType.kBrushed);
         leftSparkController2.setInverted(false);
+        leftSparkController2.setOpenLoopRampRate(0.5);
+        leftSparkController2.setClosedLoopRampRate(0.5);
         leftSparkController2.burnFlash();
 
     }
