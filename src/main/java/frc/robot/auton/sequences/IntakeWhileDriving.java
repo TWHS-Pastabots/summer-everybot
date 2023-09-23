@@ -3,7 +3,7 @@ package frc.robot.auton.sequences;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import frc.robot.auton.commands.AutoArmGroundIntake;
 import frc.robot.auton.commands.AutoDrive;
-import frc.robot.auton.commands.AutoIntake;
+import frc.robot.auton.commands.*;
 
 public class IntakeWhileDriving extends ParallelCommandGroup {
   /** Creates a new IntakeWhileDriving. */

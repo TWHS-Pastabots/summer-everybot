@@ -30,6 +30,8 @@ public class Robot extends TimedRobot {
     private Intake intake;
     private Arm arm;
 
+    private boolean outtake;
+
     private Anshton anshton;
     private Test test;
 
@@ -85,7 +87,11 @@ public class Robot extends TimedRobot {
         /* Intake Controls */
 
         // separate these into different variables for readability
-        boolean outtake = operator.getRawButton(Controller.PS_CIRCLE);
+        if (arm.state != ArmState.RETRACTED){
+            outtake = operator.getRawButton(Controller.PS_CIRCLE);
+        } else {
+           outtake = false;
+        }
         boolean intakeButton = operator.getRawButton(Controller.PS_SQUARE);
 
         intake.update(outtake, intakeButton);
