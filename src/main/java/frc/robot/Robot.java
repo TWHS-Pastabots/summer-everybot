@@ -56,15 +56,14 @@ public class Robot extends TimedRobot {
         chargingStation = new ChargingStation();
         chargingStation.initialize();
         // anshton.initialize();
-        chargingStation.execute();
-        // anshton.execute();
+
     }
 
     @Override
     public void autonomousPeriodic() {
-
+        // chargingStation.execute();
+        anshton.execute();
         arm.update(0, 0);
-
     }
 
     @Override

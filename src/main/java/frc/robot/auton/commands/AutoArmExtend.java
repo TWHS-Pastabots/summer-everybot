@@ -21,7 +21,7 @@ public class AutoArmExtend extends CommandBase {
     public void execute() {
         arm.setState(ArmState.EXTENDED);
 
-        if (arm.hasReachedTargetPose(1.0)) {
+        if (arm.hasReachedTargetPose(2.0)) {
             ended = true;
         }
     }
