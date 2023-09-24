@@ -22,7 +22,7 @@ public class AutoArmShoot extends CommandBase {
     public void execute() {
         arm.setState(ArmState.SHOOT);
 
-        if (arm.hasReachedTargetPose(1.5)) {
+        if (arm.hasReachedTargetPose(3.5)) {
             ended = true;
         }
 

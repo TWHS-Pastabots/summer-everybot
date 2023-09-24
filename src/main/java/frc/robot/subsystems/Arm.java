@@ -16,7 +16,7 @@ public class Arm {
 
     private ArmControlSpeed controlSpeed = ArmControlSpeed.FULL;
 
-    private PIDController armPID = new PIDController(0.8, 0.0, 0.0);
+    private PIDController armPID = new PIDController(0.6, 0.05, 0.1);
     private PIDController lowerArmPID = new PIDController(.4, 0.0, 0.0);
 
     private CANSparkMax armController;
@@ -25,7 +25,7 @@ public class Arm {
     public ArmState state = ArmState.RETRACTED;
 
     public enum ArmState {
-        RETRACTED(5, -30, true, 4),
+        RETRACTED(3.1, -10, true, 4),
         EXTENDED(-37, -25, true, 4),
         GROUND_INTAKE(-13, 50, false, 3),
         MID(-25, -25, true, 4),
@@ -75,6 +75,8 @@ public class Arm {
     public void update(double lowerPower, double upperPower) {
         SmartDashboard.putNumber("ARM POSITION", armController.getEncoder().getPosition());
         SmartDashboard.putNumber("LOWER ARM POSITION", lowArmController.getEncoder().getPosition());
+        SmartDashboard.putNumber("ARM POSITION REQUESTED", state.poseU);
+        SmartDashboard.putNumber("LOWER ARM POSITION REQUESTED", state.poseL);
         SmartDashboard.putString("Arm State", state.toString());
 
         if (controlState == ArmControlState.MANUAL) {
