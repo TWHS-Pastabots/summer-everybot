@@ -6,6 +6,13 @@
   "configurations": [
     {
       "type": "java",
+      "name": "Launch Drivebase",
+      "request": "launch",
+      "mainClass": "frc.robot.subsystems.Drivebase",
+      "projectName": "summer-everybot"
+    },
+    {
+      "type": "java",
       "name": "Main",
       "request": "launch",
       "mainClass": "frc.robot.Main",

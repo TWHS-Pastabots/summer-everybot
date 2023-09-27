@@ -19,7 +19,7 @@ public class Drivebase {
 
     public enum DriveSpeed {
         SLOW(0.25),
-        FAST(0.5);
+        FAST(0.35);
 
         public final double speed;
 
@@ -58,8 +58,8 @@ public class Drivebase {
     }
 
     public void drive(double forward, double turn) {
-        double leftSpeed = Misc.clamp(forward - turn, -1, 1) * driveSpeed.speed;
-        double rightSpeed = Misc.clamp(forward + turn, -1, 1) * driveSpeed.speed;
+        double leftSpeed = Misc.clamp(forward - turn, -1, 1);
+        double rightSpeed = Misc.clamp(forward + turn, -1, 1);
 
         leftSparkController1.set(leftSpeed);
         leftSparkController2.set(leftSpeed);

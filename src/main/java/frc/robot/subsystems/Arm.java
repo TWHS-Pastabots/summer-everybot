@@ -26,11 +26,11 @@ public class Arm {
 
     public enum ArmState {
         RETRACTED(3.1, -10, true, 4),
-        EXTENDED(-37, -25, true, 4),
+        EXTENDED(-37, -25, true, 6),
         GROUND_INTAKE(-13, 50, false, 3),
         MID(-25, -25, true, 4),
         LOW(-13, 0, false, 3),
-        SHOOT(-35, -40, true, 4);
+        SHOOT(-25, -111, true, 4);
         // - low values move the arm higher
 
         // + high values move the arm lower

@@ -17,7 +17,7 @@ public class Intake {
 
     public enum IntakeState {
         INTAKE(0.5),
-        OUTTAKE(-0.5),
+        OUTTAKE(-1.0),
         SHOOT(-1),
         OFF(0);
 
@@ -31,6 +31,8 @@ public class Intake {
     public Intake() {
         intakeController = new CANSparkMax(Ports.INTAKE, MotorType.kBrushless);
         intakeController.setInverted(false);
+        intakeController.setOpenLoopRampRate(0);
+        intakeController.setClosedLoopRampRate(0);
         intakeController.setIdleMode(IdleMode.kBrake);
         intakeController.burnFlash();
     }

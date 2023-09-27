@@ -12,9 +12,7 @@ public class ChargingStation extends SequentialCommandGroup {
   public ChargingStation() {
 
     addCommands(
-        new AutoArmShoot(), // Shooting position
-        new AutoOuttake(0.25), // Has scored the piece
-        new AutoArmRetract(),
+        new ScorePreLoaded(),
         new AutoDrive(0, 0, 60));
   }
 }
