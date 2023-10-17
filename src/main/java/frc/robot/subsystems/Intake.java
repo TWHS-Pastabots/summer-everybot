@@ -4,6 +4,7 @@ import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
 import com.revrobotics.CANSparkMax.IdleMode;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 import frc.robot.Ports;
 import frc.robot.subsystems.Arm.ArmState;
@@ -59,6 +60,8 @@ public class Intake {
         updateState(outtake, intake);
 
         intakeController.set(state.power);
+
+        SmartDashboard.putNumber("INTAKE VOLTS", intakeController.getBusVoltage());
     }
 
     public static Intake getInstance() {

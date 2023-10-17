@@ -2,6 +2,7 @@ package frc.robot.subsystems;
 
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 import frc.robot.Misc;
 import frc.robot.Ports;
@@ -18,8 +19,8 @@ public class Drivebase {
     private static Drivebase instance;
 
     public enum DriveSpeed {
-        SLOW(0.25),
-        FAST(0.35);
+        SLOW(0.1),
+        FAST(0.25);
 
         public final double speed;
 
@@ -30,6 +31,7 @@ public class Drivebase {
 
     public Drivebase() {
         /* Right motor group */
+
         rightSparkController1 = new CANSparkMax(Ports.DRIVE_RIGHT_1, MotorType.kBrushed);
         rightSparkController1.setInverted(true);
         rightSparkController1.setOpenLoopRampRate(0.5);
@@ -58,8 +60,15 @@ public class Drivebase {
     }
 
     public void drive(double forward, double turn) {
-        double leftSpeed = Misc.clamp(forward - turn, -1, 1);
-        double rightSpeed = Misc.clamp(forward + turn, -1, 1);
+        double leftSpeed = Misc.clamp((forward * driveSpeed.speed) - turn, -1, 1);
+        double rightSpeed = Misc.clamp((forward * driveSpeed.speed) + turn, -1, 1);
+
+        SmartDashboard.putNumber("RIGHT SPEED", (int) (rightSpeed * 100));
+        SmartDashboard.putNumber("LEFT SPEED", (int) (leftSpeed * 100));
+        SmartDashboard.putNumber("LEFT 1 OUTPUT", leftSparkController1.getOutputCurrent());
+        SmartDashboard.putNumber("LEFT 2 OUTPUT", leftSparkController1.getOutputCurrent());
+        SmartDashboard.putNumber("RIGHT 1 OUTPUT", leftSparkController1.getOutputCurrent());
+        SmartDashboard.putNumber("RIGHT 2 OUTPUT", leftSparkController1.getOutputCurrent());
 
         leftSparkController1.set(leftSpeed);
         leftSparkController2.set(leftSpeed);

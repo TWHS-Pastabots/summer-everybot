@@ -6,25 +6,25 @@ package frc.robot;
 
 import edu.wpi.first.wpilibj.PS4Controller;
 import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+
 import frc.robot.subsystems.Drivebase;
 import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.Arm.*;
 import frc.robot.subsystems.Drivebase.DriveSpeed;
 import frc.robot.subsystems.Arm;
 import frc.robot.auton.sequences.*;
+import edu.wpi.first.wpilibj.SPI;
+import com.kauailabs.navx.frc.AHRS;
 
-/**
- * The VM is configured to automatically run this class, and to call the
- * functions corresponding to
- * each mode, as described in the TimedRobot documentation. If you change the
- * name of this class or
- * the package after creating this project, you must also update the
- * build.gradle file in the
- * project.
- */
 public class Robot extends TimedRobot {
     private PS4Controller driver; // blue
-    private PS4Controller operator; // red
+    private XboxController operator; // red
+
+    // private Joystick operator;
+    // private AnalogInput test;
 
     private Drivebase drivebase;
     private Intake intake;
@@ -32,10 +32,17 @@ public class Robot extends TimedRobot {
 
     private boolean outtake;
     private boolean cycle;
+    private boolean manual;
 
-    private Anshton anshton;
-    private ChargingStation chargingStation;
-    private Bump bump;
+    private static final String kDefaultAuto = "Test1";
+    private static final String kCustomAuto = "Test2";
+    private String m_autoSelected;
+    private final SendableChooser<String> m_chooser = new SendableChooser<>();
+
+    private Test1 test1;
+    private Test2 test2;
+
+    private static final AHRS gyro = new AHRS(SPI.Port.kMXP);
 
     private RobotMode robotMode = RobotMode.EXHIBITION;
 
@@ -47,41 +54,59 @@ public class Robot extends TimedRobot {
     @Override
     public void robotInit() {
 
+        m_chooser.setDefaultOption("Test1", kDefaultAuto);
+        m_chooser.addOption("Test2", kCustomAuto);
+        SmartDashboard.putData("AUTON SEQUENCES", m_chooser);
+
         drivebase = Drivebase.getInstance();
         intake = Intake.getInstance();
         arm = Arm.getInstance();
+        gyro.calibrate();
     }
 
     @Override
     public void robotPeriodic() {
+        SmartDashboard.putString("Robot mode", robotMode.toString());
+        SmartDashboard.putBoolean("Manual:", manual);
+        SmartDashboard.putNumber("Gyro Angle:", gyro.getAngle());
     }
 
     @Override
     public void autonomousInit() {
+        m_autoSelected = m_chooser.getSelected();
+        System.out.println("Auto selected: " + m_autoSelected);
+
         arm.setControlState(ArmControlState.PID);
 
-        anshton = new Anshton();
-        chargingStation = new ChargingStation();
-        bump = new Bump();
-        chargingStation.initialize();
-        anshton.initialize();
-        bump.initialize();
+        test1 = new Test1();
+        test2 = new Test2();
+
+        test1.initialize();
+        test2.initialize();
 
     }
 
     @Override
     public void autonomousPeriodic() {
         arm.update(0, 0);
-        // chargingStation.execute();
-        // bump.execute();
-        anshton.execute();
+
+        switch (m_autoSelected) {
+            case kCustomAuto:
+                test2.execute();
+                break;
+            case kDefaultAuto:
+            default:
+                test1.execute();
+                break;
+        }
 
     }
 
     @Override
     public void teleopInit() {
         driver = new PS4Controller(0);
-        operator = new PS4Controller(1);
+        operator = new XboxController(1);
+        // operator = new Joystick(1);
     }
 
     @Override
@@ -110,44 +135,78 @@ public class Robot extends TimedRobot {
 
             /* Arm Controls */
 
-            // finer control when holding L1
-            if (operator.getL1Button()) {
-                arm.setControlSpeed(ArmControlSpeed.FINE);
-            } else {
-                arm.setControlSpeed(ArmControlSpeed.FULL);
-            }
+            // // finer control when holding L1
+            // if (operator.getL1Button()) {
+            // arm.setControlSpeed(ArmControlSpeed.FINE);
+            // } else {
+            // arm.setControlSpeed(ArmControlSpeed.FULL);
+            // }
 
             // manage arm control states
             if (driver.getTriangleButtonPressed()) {
                 if (arm.controlState == ArmControlState.MANUAL) {
                     arm.setControlState(ArmControlState.PID);
+                    manual = false;
                 } else {
                     arm.setControlState(ArmControlState.MANUAL);
+                    manual = true;
                 }
             }
 
-            // manage arm PID states & update
-            // the logic for whether or not the PID/manual mode actually runs is in Arm.java
+            // // manage arm PID states & update
+            // // the logic for whether or not the PID/manual mode actually runs is in
+            // Arm.java
 
-            if (operator.getRawButton(Controller.PS_R1)) {
-                arm.setState(ArmState.EXTENDED);
-            } else if (operator.getRawButton(Controller.PS_L1)) {
-                arm.setState(ArmState.GROUND_INTAKE);
-            } else if (operator.getRawButton(Controller.PS_CROSS)) {
-                arm.setState(ArmState.RETRACTED);
-            } else if (operator.getRawButtonPressed(Controller.PS_TRIANGLE)) {
-                if (cycle) {
-                    arm.setState(ArmState.MID);
-                    cycle = false;
-                } else {
-                    arm.setState(ArmState.LOW);
-                    cycle = true;
-                }
-            }
+            // if (operator.getRawButton(Controller.PS_R1)) {
+            // arm.setState(ArmState.EXTENDED);
+            // } else if (operator.getRawButton(Controller.PS_L1)) {
+            // arm.setState(ArmState.GROUND_INTAKE);
+            // } else if (operator.getRawButton(Controller.PS_CROSS)) {
+            // arm.setState(ArmState.RETRACTED);
+            // } else if (operator.getRawButtonPressed(Controller.PS_TRIANGLE)) {
+            // if (cycle) {
+            // arm.setState(ArmState.MID);
+            // cycle = false;
+            // } else {
+            // arm.setState(ArmState.LOW);
+            // cycle = true;
+            // }
+            // }
 
-            arm.update(operator.getRawAxis(Controller.PS_AXIS_RIGHT_Y) * .5,
-                    operator.getRawAxis(Controller.PS_AXIS_LEFT_Y) * .5);
+            // arm.update(operator.getRawAxis(Controller.PS_AXIS_RIGHT_Y) * .5,
+            // operator.getRawAxis(Controller.PS_AXIS_LEFT_Y) * .5);
         } else {
+
+            /* Joystick */
+
+            // arm
+            if (operator.getRawButton(Controller.XBOX_x)) {
+                arm.setState(ArmState.SHOOT);
+            } else if (operator.getRawButton(Controller.XBOX_Y)) {
+                arm.setState(ArmState.GROUND_INTAKE);
+            } else if (operator.getRawButton(Controller.XBOX_LB)) {
+                arm.setState(ArmState.RETRACTED);
+            }
+
+            drivebase.drive(operator.getLeftY(), operator.getLeftX() * 0.75);
+            arm.update(0, 0);
+
+            // intake
+            // if (operator.getRawButton(Controller.XBOX_A)) {
+            // intake.setState(IntakeState.INTAKE);
+            // } else if (operator.getRawButton(Controller.XBOX_B)) {
+            // intake.setState(IntakeState.OUTTAKE);
+            // } else {
+            // intake.setState(IntakeState.OFF);
+            // }
+
+            if (arm.state != ArmState.RETRACTED) {
+                outtake = operator.getRawButton(Controller.XBOX_A);
+            } else {
+                outtake = false;
+            }
+            boolean intakeButton = operator.getRawButton(Controller.XBOX_B);
+            intake.update(outtake, intakeButton);
 
             /* Drive Controls */
 
@@ -160,51 +219,52 @@ public class Robot extends TimedRobot {
 
             double turn = driver.getRawAxis(Controller.PS_AXIS_LEFT_X);
 
-            drivebase.drive(0, turn * 0.4);
+            // drivebase.drive(0, turn * 0.4);
 
             /* Arm Controls */
 
-            // finer control when holding L1
-            if (operator.getL1Button()) {
-                arm.setControlSpeed(ArmControlSpeed.FINE);
-            } else {
-                arm.setControlSpeed(ArmControlSpeed.FULL);
-            }
+            // // finer control when holding L1
+            // if (operator.getL1Button()) {
+            // arm.setControlSpeed(ArmControlSpeed.FINE);
+            // } else {
+            // arm.setControlSpeed(ArmControlSpeed.FULL);
+            // }
 
-            // manage arm control states
-            if (driver.getTriangleButtonPressed()) {
-                if (arm.controlState == ArmControlState.MANUAL) {
-                    arm.setControlState(ArmControlState.PID);
-                } else {
-                    arm.setControlState(ArmControlState.MANUAL);
-                }
-            }
+            // // manage arm control states
+            // if (driver.getTriangleButtonPressed()) {
+            // if (arm.controlState == ArmControlState.MANUAL) {
+            // arm.setControlState(ArmControlState.PID);
+            // } else {
+            // arm.setControlState(ArmControlState.MANUAL);
+            // }
+            // }
 
             // manage arm PID states & update
 
-            if (operator.getRawButton(Controller.PS_CROSS)) {
-                arm.setState(ArmState.RETRACTED);
-            } else if (operator.getRawButtonPressed(Controller.PS_TRIANGLE)) {
-                arm.setState(ArmState.MID);
-            } else if (operator.getRawButton(Controller.PS_R1)) {
-                arm.setState(ArmState.SHOOT);
-            }
+            // if (operator.getRawButton(Controller.PS_CROSS)) {
+            // arm.setState(ArmState.RETRACTED);
+            // } else if (operator.getRawButtonPressed(Controller.PS_TRIANGLE)) {
+            // arm.setState(ArmState.MID);
+            // } else if (operator.getRawButton(Controller.PS_R1)) {
+            // arm.setState(ArmState.SHOOT);
+            // }
 
-            arm.update(operator.getRawAxis(Controller.PS_AXIS_RIGHT_Y) * .5,
-                    operator.getRawAxis(Controller.PS_AXIS_LEFT_Y) * .5);
+            // arm.update(operator.getRawAxis(Controller.PS_AXIS_RIGHT_Y) * .5,
+            // operator.getRawAxis(Controller.PS_AXIS_LEFT_Y) * .5);
 
+            // }
+
+            // /* Intake Controls */
+
+            // if (arm.state != ArmState.RETRACTED) {
+            // outtake = operator.getRawButton(Controller.PS_CIRCLE);
+            // } else {
+            // outtake = false;
+            // }
+            // boolean intakeButton = operator.getRawButton(Controller.PS_SQUARE);
+
+            // intake.update(outtake, intakeButton);
         }
-
-        /* Intake Controls */
-
-        if (arm.state != ArmState.RETRACTED) {
-            outtake = operator.getRawButton(Controller.PS_CIRCLE);
-        } else {
-            outtake = false;
-        }
-        boolean intakeButton = operator.getRawButton(Controller.PS_SQUARE);
-
-        intake.update(outtake, intakeButton);
     }
 
     @Override
