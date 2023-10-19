@@ -184,10 +184,8 @@ public class Robot extends TimedRobot {
                 arm.setState(ArmState.RETRACTED);
             }
 
-            double turn = driver.getRawAxis(Controller.PS_AXIS_LEFT_X) * 0.4;
-
             if (arm.state == ArmState.RETRACTED) {
-                drivebase.drive(0, turn);
+                drivebase.drive(operator.getLeftY() * 0.5, operator.getLeftX() * 0.4);
             } else {
                 drivebase.drive(0, 0);
             }
