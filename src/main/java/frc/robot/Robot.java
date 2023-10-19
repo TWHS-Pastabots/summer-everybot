@@ -23,9 +23,6 @@ public class Robot extends TimedRobot {
     private PS4Controller driver; // blue
     private XboxController operator; // red
 
-    // private Joystick operator;
-    // private AnalogInput test;
-
     private Drivebase drivebase;
     private Intake intake;
     private Arm arm;
@@ -106,15 +103,14 @@ public class Robot extends TimedRobot {
     public void teleopInit() {
         driver = new PS4Controller(0);
         operator = new XboxController(1);
-        // operator = new Joystick(1);
     }
 
     @Override
     public void teleopPeriodic() {
 
-        if (driver.getRawButton(Controller.PS_CIRCLE)) {
+        if (operator.getRawButton(Controller.XBOX_RB)) {
             robotMode = RobotMode.COMPETITION;
-        } else if (driver.getRawButton(Controller.PS_SQUARE)) {
+        } else if (operator.getRawButton(Controller.XBOX_SHARE)) {
             robotMode = RobotMode.EXHIBITION;
         }
 
@@ -135,12 +131,12 @@ public class Robot extends TimedRobot {
 
             /* Arm Controls */
 
-            // // finer control when holding L1
-            // if (operator.getL1Button()) {
-            // arm.setControlSpeed(ArmControlSpeed.FINE);
-            // } else {
-            // arm.setControlSpeed(ArmControlSpeed.FULL);
-            // }
+            // finer control when holding L1
+            if (operator.getRawButton(Controller.XBOX_LB)) {
+                arm.setControlSpeed(ArmControlSpeed.FINE);
+            } else {
+                arm.setControlSpeed(ArmControlSpeed.FULL);
+            }
 
             // manage arm control states
             if (driver.getTriangleButtonPressed()) {
@@ -157,24 +153,24 @@ public class Robot extends TimedRobot {
             // // the logic for whether or not the PID/manual mode actually runs is in
             // Arm.java
 
-            // if (operator.getRawButton(Controller.PS_R1)) {
-            // arm.setState(ArmState.EXTENDED);
-            // } else if (operator.getRawButton(Controller.PS_L1)) {
-            // arm.setState(ArmState.GROUND_INTAKE);
-            // } else if (operator.getRawButton(Controller.PS_CROSS)) {
-            // arm.setState(ArmState.RETRACTED);
-            // } else if (operator.getRawButtonPressed(Controller.PS_TRIANGLE)) {
-            // if (cycle) {
-            // arm.setState(ArmState.MID);
-            // cycle = false;
-            // } else {
-            // arm.setState(ArmState.LOW);
-            // cycle = true;
-            // }
-            // }
+            if (operator.getRawButton(Controller.PS_R1)) {
+                arm.setState(ArmState.EXTENDED);
+            } else if (operator.getRawButton(Controller.PS_L1)) {
+                arm.setState(ArmState.GROUND_INTAKE);
+            } else if (operator.getRawButton(Controller.PS_CROSS)) {
+                arm.setState(ArmState.RETRACTED);
+            } else if (operator.getRawButtonPressed(Controller.PS_TRIANGLE)) {
+                if (cycle) {
+                    arm.setState(ArmState.MID);
+                    cycle = false;
+                } else {
+                    arm.setState(ArmState.LOW);
+                    cycle = true;
+                }
+            }
 
-            // arm.update(operator.getRawAxis(Controller.PS_AXIS_RIGHT_Y) * .5,
-            // operator.getRawAxis(Controller.PS_AXIS_LEFT_Y) * .5);
+            arm.update(operator.getRawAxis(Controller.PS_AXIS_RIGHT_Y) * .5,
+                    operator.getRawAxis(Controller.PS_AXIS_LEFT_Y) * .5);
         } else {
 
             /* Joystick */
@@ -188,23 +184,20 @@ public class Robot extends TimedRobot {
                 arm.setState(ArmState.RETRACTED);
             }
 
-            drivebase.drive(operator.getLeftY(), operator.getLeftX() * 0.75);
-            arm.update(0, 0);
+            double turn = driver.getRawAxis(Controller.PS_AXIS_LEFT_X) * 0.4;
 
-            // intake
-            // if (operator.getRawButton(Controller.XBOX_A)) {
-            // intake.setState(IntakeState.INTAKE);
-            // } else if (operator.getRawButton(Controller.XBOX_B)) {
-            // intake.setState(IntakeState.OUTTAKE);
-            // } else {
-            // intake.setState(IntakeState.OFF);
-            // }
+            if (arm.state == ArmState.RETRACTED) {
+                drivebase.drive(0, turn);
+            } else {
+                drivebase.drive(0, 0);
+            }
 
             if (arm.state != ArmState.RETRACTED) {
                 outtake = operator.getRawButton(Controller.XBOX_A);
             } else {
                 outtake = false;
             }
+
             boolean intakeButton = operator.getRawButton(Controller.XBOX_B);
             intake.update(outtake, intakeButton);
 
@@ -217,53 +210,8 @@ public class Robot extends TimedRobot {
                 drivebase.setDriveSpeed(DriveSpeed.FAST);
             }
 
-            double turn = driver.getRawAxis(Controller.PS_AXIS_LEFT_X);
+            arm.update(0, 0);
 
-            // drivebase.drive(0, turn * 0.4);
-
-            /* Arm Controls */
-
-            // // finer control when holding L1
-            // if (operator.getL1Button()) {
-            // arm.setControlSpeed(ArmControlSpeed.FINE);
-            // } else {
-            // arm.setControlSpeed(ArmControlSpeed.FULL);
-            // }
-
-            // // manage arm control states
-            // if (driver.getTriangleButtonPressed()) {
-            // if (arm.controlState == ArmControlState.MANUAL) {
-            // arm.setControlState(ArmControlState.PID);
-            // } else {
-            // arm.setControlState(ArmControlState.MANUAL);
-            // }
-            // }
-
-            // manage arm PID states & update
-
-            // if (operator.getRawButton(Controller.PS_CROSS)) {
-            // arm.setState(ArmState.RETRACTED);
-            // } else if (operator.getRawButtonPressed(Controller.PS_TRIANGLE)) {
-            // arm.setState(ArmState.MID);
-            // } else if (operator.getRawButton(Controller.PS_R1)) {
-            // arm.setState(ArmState.SHOOT);
-            // }
-
-            // arm.update(operator.getRawAxis(Controller.PS_AXIS_RIGHT_Y) * .5,
-            // operator.getRawAxis(Controller.PS_AXIS_LEFT_Y) * .5);
-
-            // }
-
-            // /* Intake Controls */
-
-            // if (arm.state != ArmState.RETRACTED) {
-            // outtake = operator.getRawButton(Controller.PS_CIRCLE);
-            // } else {
-            // outtake = false;
-            // }
-            // boolean intakeButton = operator.getRawButton(Controller.PS_SQUARE);
-
-            // intake.update(outtake, intakeButton);
         }
     }
 

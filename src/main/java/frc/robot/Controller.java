@@ -28,5 +28,7 @@ public final class Controller {
     public static final int XBOX_x = 3;
     public static final int XBOX_Y = 4;
     public static final int XBOX_LB = 5;
+    public static final int XBOX_RB = 6;
+    public static final int XBOX_SHARE = 7;
 
 }
